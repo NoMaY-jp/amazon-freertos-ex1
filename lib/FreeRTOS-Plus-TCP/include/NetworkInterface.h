@@ -35,6 +35,7 @@ BaseType_t xNetworkInterfaceInitialise( void );
 BaseType_t xNetworkInterfaceOutput( NetworkBufferDescriptor_t * const pxNetworkBuffer, BaseType_t xReleaseAfterSend );
 void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkBuffers[ ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS ] );
 BaseType_t xGetPhyLinkStatus( void );
+uint32_t ulRand(void);
 
 #ifdef __cplusplus
 } // extern "C"
