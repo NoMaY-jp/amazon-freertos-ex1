@@ -167,7 +167,7 @@ uint32_t ulRand(void)
 {
 	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
 	uint32_t tmp;
-	get_random_number(tmp, 4);
+	get_random_number(&tmp, 4);
 	return tmp;
 }
 

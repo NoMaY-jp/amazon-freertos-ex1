@@ -471,10 +471,11 @@
           <Path>src\FreeRTOS_user\freertos_usr_func.h</Path>
         </Category>
         <Category Name="realtime_OS_pkg">
-          <Path>src\realtime_OS_pkg\update!.hwsetup.c</Path>
-          <Path>src\realtime_OS_pkg\update!.txt</Path>
+          <Path>src\realtime_OS_pkg\get!.txt</Path>
+          <Category Name="hwsetup">
+            <Path>src\realtime_OS_pkg\hwsetup\hwsetup.c</Path>
+          </Category>
           <Category Name="r_bsp_rtos">
-            <Path>src\realtime_OS_pkg\r_bsp_rtos\placeholder.txt</Path>
             <Path>src\realtime_OS_pkg\r_bsp_rtos\platform.h</Path>
             <Path>src\realtime_OS_pkg\r_bsp_rtos\readme.txt</Path>
             <Category Name="board">
@@ -537,7 +538,6 @@
             </Category>
           </Category>
           <Category Name="r_cmt_rtos_rx">
-            <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\placeholder.txt</Path>
             <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\r_cmt_rx_if.h</Path>
             <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\readme.txt</Path>
             <Category Name="doc">
@@ -557,6 +557,7 @@
           </Category>
         </Category>
         <Category Name="smc_gen">
+          <Path>src\smc_gen\generate!.txt</Path>
           <Category Name="general">
             <Path>src\smc_gen\general\r_cg_hardware_setup.c</Path>
             <Path>src\smc_gen\general\r_cg_macrodriver.h</Path>
@@ -650,6 +651,7 @@
             <Path>src\smc_gen\r_config\r_bsp_interrupt_config.h</Path>
             <Path>src\smc_gen\r_config\r_cmt_rx_config.h</Path>
             <Path>src\smc_gen\r_config\r_ether_rx_config.h</Path>
+            <Path>src\smc_gen\r_config\r_flash_rx_config.h</Path>
           </Category>
           <Category Name="r_ether_rx">
             <Path>src\smc_gen\r_ether_rx\r_ether_rx_if.h</Path>
@@ -675,6 +677,60 @@
               <Category Name="targets">
                 <Category Name="rx65n">
                   <Path>src\smc_gen\r_ether_rx\src\targets\rx65n\r_ether_setting_rx65n.c</Path>
+                </Category>
+              </Category>
+            </Category>
+          </Category>
+          <Category Name="r_flash_rx">
+            <Path>src\smc_gen\r_flash_rx\r_flash_rx_if.h</Path>
+            <Path>src\smc_gen\r_flash_rx\readme.txt</Path>
+            <Category Name="doc">
+              <Category Name="en">
+                <Path>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0320-rx.pdf</Path>
+              </Category>
+              <Category Name="ja">
+                <Path>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0320-rx.pdf</Path>
+              </Category>
+            </Category>
+            <Category Name="ref">
+              <Path>src\smc_gen\r_flash_rx\ref\r_flash_rx_config_reference.h</Path>
+            </Category>
+            <Category Name="src">
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.c</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.h</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_group.c</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_group.h</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.c</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.h</Path>
+              <Path>src\smc_gen\r_flash_rx\src\r_flash_targets.h</Path>
+              <Category Name="flash_type_1">
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.h</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.h</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.h</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_common.h</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1_if.h</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_utils.c</Path>
+              </Category>
+              <Category Name="flash_type_2">
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2_if.h</Path>
+              </Category>
+              <Category Name="flash_type_3">
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3_if.h</Path>
+              </Category>
+              <Category Name="flash_type_4">
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4.c</Path>
+                <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4_if.h</Path>
+              </Category>
+              <Category Name="targets">
+                <Category Name="rx65n">
+                  <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_flash_rx65n.h</Path>
+                  <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_mcu_config_reference.h</Path>
                 </Category>
               </Category>
             </Category>
@@ -725,6 +781,13 @@
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_cmt_rx"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_cmt_rx\src"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_ether_rx"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_1"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_2"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_3"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_4"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\targets"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</Option>
           <Option>-nomessage</Option>
@@ -904,8 +967,8 @@
           <Path>HardwareDebug\lcd_conf.obj</Path>
           <Path>HardwareDebug\r_ascii.obj</Path>
           <Path>HardwareDebug\r_simple_graphic.obj</Path>
-          <Path>HardwareDebug\dbsct.obj</Path>
           <Path>HardwareDebug\hwsetup.obj</Path>
+          <Path>HardwareDebug\dbsct.obj</Path>
           <Path>HardwareDebug\lowlvl.obj</Path>
           <Path>HardwareDebug\lowsrc.obj</Path>
           <Path>HardwareDebug\resetprg.obj</Path>
@@ -928,6 +991,17 @@
           <Path>HardwareDebug\phy.obj</Path>
           <Path>HardwareDebug\r_ether_rx.obj</Path>
           <Path>HardwareDebug\r_ether_setting_rx65n.obj</Path>
+          <Path>HardwareDebug\r_codeflash.obj</Path>
+          <Path>HardwareDebug\r_codeflash_extra.obj</Path>
+          <Path>HardwareDebug\r_dataflash.obj</Path>
+          <Path>HardwareDebug\r_flash_type1.obj</Path>
+          <Path>HardwareDebug\r_flash_utils.obj</Path>
+          <Path>HardwareDebug\r_flash_type2.obj</Path>
+          <Path>HardwareDebug\r_flash_type3.obj</Path>
+          <Path>HardwareDebug\r_flash_type4.obj</Path>
+          <Path>HardwareDebug\r_flash_fcu.obj</Path>
+          <Path>HardwareDebug\r_flash_group.obj</Path>
+          <Path>HardwareDebug\r_flash_rx.obj</Path>
           <Path>HardwareDebug\Pin.obj</Path>
           <Path>HardwareDebug\r_ether_rx_pinset.obj</Path>
           <Path>HardwareDebug\aws_demos.lib</Path>
@@ -937,7 +1011,7 @@
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\FTP\FreeRTOS_FTP_server.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\HTTP\FreeRTOS_HTTP_server.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\NTP\NTPDemo.c"/>
-        <NoTargetFile Target="src\realtime_OS_pkg\update!.hwsetup.c"/>
+        <NoTargetFile Target="src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.c"/>
         <NoTargetFile Target="src\rx65n_rsk_aws.c"/>
         <CommonOptions>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\"</IncludePathForC>
@@ -966,6 +1040,13 @@
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_cmt_rx"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_cmt_rx\src"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_ether_rx"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_1"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_2"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_3"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_4"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\targets"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</IncludePathForC>
         </CommonOptions>

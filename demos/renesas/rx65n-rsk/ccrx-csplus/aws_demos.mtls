@@ -129,8 +129,8 @@ freertos_usr_func.obj
 lcd_conf.obj
 r_ascii.obj
 r_simple_graphic.obj
-dbsct.obj
 hwsetup.obj
+dbsct.obj
 lowlvl.obj
 lowsrc.obj
 resetprg.obj
@@ -153,5 +153,16 @@ r_smc_interrupt.obj
 phy.obj
 r_ether_rx.obj
 r_ether_setting_rx65n.obj
+r_codeflash.obj
+r_codeflash_extra.obj
+r_dataflash.obj
+r_flash_type1.obj
+r_flash_utils.obj
+r_flash_type2.obj
+r_flash_type3.obj
+r_flash_type4.obj
+r_flash_fcu.obj
+r_flash_group.obj
+r_flash_rx.obj
 Pin.obj
 r_ether_rx_pinset.obj

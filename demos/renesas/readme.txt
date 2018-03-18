@@ -13,16 +13,313 @@ https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/
 ■開発環境
 --------------------------------------------------------------------------
 ボード：RX65N Envision Kit 
+        https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
         Renesas Starter Kit+ for RX65N-2MB (Trusted Secure IP搭載)　※
+        https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
+デバッガ：E2OB(RX65N Envision Kitの場合(オンボードなので追加購入不要))
+          E1エミュレータ(RX65N Starter Kit+ for RX65N-2MBの場合(キットに付属のため追加購入不要))
 コンパイラ：CC-RX V2.08
+        https://www.renesas.com/ja-jp/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
 IDE：e2 studio V6.2.0
-
+        https://www.renesas.com/ja-jp/products/software-tools/tools/ide/e2studio.html
     ※開発はRX65N Envision Kit で行い、
     　適宜Renesas Starter Kit+ for RX65N-2MB (Trusted Secure IP搭載)でも
 　　　動くようにする。
 
 --------------------------------------------------------------------------
+■進捗
+--------------------------------------------------------------------------
+RX65N Envision Kit、RX65N RSK(2MB版/暗号器あり品)をターゲットにコードメンテを維持します。
+下記 Amazon FreeRTOS 1.2.x は適宜最新コードに更新していきます。
+2018/03/17時点での適用コードは 1.2.2 です。
+
+①ルネサスTCP/IPをターゲットで動作させる（Etherの動作確認）
+②SDIO無線LANを動作確認した時期のFreeRTOS 8.2.2をターゲットで動作させる
+③ルネサスのFreeRTOSパッケージ、9.0.0をターゲットで動作させる
+④Amazon FreeRTOS 1.2.xのFreeRTOS部分をターゲットで動作させる
+⑤Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分をターゲットで動作させる
+⑥Amazon FreeRTOS 1.2.xのmbed TLS部分をターゲットで動作させる
+⑦Amazon FreeRTOS 1.2.xのMQTT部分をターゲットで動作させる（AWSへの接続実験）
+⑧Amazon FreeRTOS 1.2.xのFreeRTOS+TCP部分のネットワーク層の結合部分を工夫して、
+　(1)Ether、(2)SPI接続無線LANモジュール、(3)SDIO無線LANモジュールの3種類を
+　切り替えられるようにする　★いまここ＠シェルティ
+⑨Amazon FreeRTOS 1.2.xのmbed TLS部分の暗号処理プリミティブの
+　ソフトウェア実装（AESとかRSAとか）をRX65N内蔵暗号器を使った
+　ハードウェア実装に置き換える　★いまここ＠協力会社
+⑩Ether層のゼロコピーに対応する
+⑪Amazon FreeRTOS本家環境にマージし、Amazon FreeRTOS本家コードへの追従を簡単にできるようにする
+⑫Amazon FreeRTOS のGitのforkに登録する
+⑬Amazon FreeRTOS のCertificationを受験し合格しGitの本家に登録する
+　docs.aws.amazon.com/.../freertos-qualification-program.html
+
+--------------------------------------------------------------------------
+■課題まとめ★
+--------------------------------------------------------------------------
+　2018/03/17
+　　2018/03/17のポーティング記録参照
+　　
+　2018/03/03以前
+　　NetworkInterface.c 
+　　(2)ゼロコピーの概念を無視するが...★
+　　(4)(送信側のゼロコピーの仕組みが不明。これもまた後で調べる★)
+　　(5)LANケーブル挿抜のイベントをTCP/IP側に通知する仕組みがあるが...★
+
+　　その他
+　　・システムログをSCIから出力するようにコード追加すればよい。(★後でメンテ)
+　　・コンパイル前処理の構文解析でエラーになっている感じ。→★ツール開発部門に問い合わせてみる。
+
+　その他
+　　NoMaY氏の提案の調整。2018/3/11 0:00 のポスト参照。
+　　https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/27511#27511
+
+--------------------------------------------------------------------------
 ■ポーティング記録	★印が解決すべき課題
+--------------------------------------------------------------------------
+2018/03/17
+　協力会社に依頼した進捗⑥⑦が戻ってきた。
+　3/3分の成果に対し、AWS接続(MQTT実装とSSL/TLS実装)が出来たようだ。
+　これで進捗⑥⑦がOKとなった。実機確認し、確かにMQTTでAWSに繋がって
+　HELLO WORLDが動いていることを確認。協力会社は現在進捗⑨の調査を進めている。
+　
+　シェルティはそろそろ⑧をメンテする必要がありそう。
+　以下に直近で検討を行った本件の無線LAN対応方針を記す。
+　
+　SPI接続の無線LANモジュールは主要国で使用/サポート可能なものとしてSilexのSX-ULPGN、
+　新興国向けにRealtekのRTL8710を選定。ホビーユース向けにEspressifのESP8266。
+　Realtekというとシェルティを組み込みネットワークの世界に誘い込んだ
+　あのカニマークのチップ、RTL8019ASを思い出す。
+　　https://www.google.co.jp/search?q=rtl8019as&source=lnms&tbm=isch&sa=X&ved=0ahUKEwjDvoyzsvLZAhVDGpQKHVjECycQ_AUICygC&biw=2021&bih=1014
+　
+　
+　SDIO接続の無線LANモジュールは計画通り村田製作所のType 1FX。
+　それぞれSDKを入手して実験できるよう手配を進めておく。
+　インタフェースはPMODになっていればどのルネサスボードにも
+　無改造で接続可能。PMODタイプがあれば尚良し。
+　PMODタイプはSPI接続最優先。（UARTだと遅いから）
+　SDKがあればSPIでもUSBでもUARTでもなんでもできるジェネリックな感じが良い。
+　
+　<<SPI接続無線LANモジュール>>
+　SilexのSX-ULPGN
+　(SDK)：未入手
+　　http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-evk/
+　(モジュール)：未入手
+　　http://www.silexamerica.com/products/connectivity-solutions/embedded-wireless/IoT-Modules/sx-ulpgn-iot-qca4010-radio-module/
+　　⇒PMODコンバータを作るか？
+　　
+　RealtekのRTL8710
+　(SDK)：未入手
+　　良いのが無い。
+　(モジュール)：未入手
+　　https://www.seeedstudio.com/RTL8710-WiFi-Module-p-2793.html
+　　⇒PMODコンバータを作るか？
+　
+　EspressifのESP8266
+　(SDK)：未入手
+　　https://www.mouser.jp/ProductDetail/Olimex-Ltd/MOD-WIFI-ESP8266?qs=QGk6feVlqMKKopUWzCH4tA%3D%3D
+　(モジュール)：
+　　⇒SDKで十分安いか？
+
+　<<SDIO接続無線LANモジュール>>
+　村田製作所のType 1FX
+　(SDK)：入手済み（ただし1台のみ。協力会社用にもう1台追加必要）
+　　https://www.digikey.jp/product-detail/ja/murata-electronics-north-america/LBWA1KL1FX-TEMP-DS-SD/490-14857-ND/6612483
+　(モジュール）：未入手
+　　https://wireless.murata.com/eng/products/rf-modules-1/embedded-wi-fi-1/type-1fx.html
+　　
+　<<無線LANドライバ開発の作戦>>
+　SPI接続の無線LANモジュールのドライバ作りは若手の教育素材に良さそう。
+　あまり難易度は高くないので、データシート見ながらとにかく作ればOK。
+
+　SDIO接続の無線LANモジュールのドライバ作りは協力会社に依頼する予定。
+　Type 1FXはBroadcomのチップセットが搭載されている。Broadcomの無線事業はCypressに
+　売却されており、現在無線LANドライバ(WICED)はCypressからオープンソース提供されている。
+　Type 1FXの前身であるType ZX用のWICEDは過去FreeRTOS上での動作確認ができたので、
+　まずType ZX用のWICEDソフトを用いてType ZXで動作確認を進めてみる。Type ZXのSDKは入手済み。
+　Type 1FX対応はWICEDのオープンソースを頑張って自力移植するか
+　村田製作所にサポート依頼するか検討。
+　
+　翻って手元での進捗⑥⑦のマージを行う。
+　その後Amazon FreeRTOS本家とのズレ具合を確認する。
+
+　rx65n_rsk_awsで実験開始。
+
+　<<進捗⑥⑦のマージ>>
+　まず変化点を分解して構造を把握していき、リポジトリ登録していく。
+　まずは定番のgrep調査。
+　以降、シェルティ版を本流、協力会社版を支流と表現する。
+　
+　rx65n_rsk_aws.c
+　　メインタスク部分。支流にはAWS接続を行うタスク起動等の処理が追加されている。
+　　本流にマージ。
+　　以下2関数が追加されている。あとで理解する。★
+　　　vApplicationGetIdleTaskMemory()
+　　　vApplicationGetTimerTaskMemory()
+　　以下関数呼び出しが増えている。あとで理解する。★
+　　　SYSTEM_Init()
+　　　
+　\rx65n_rsk_aws_\src\amazon-freertos-master
+　 \demos\common
+　　以下ファイル/フォルダが増えている。デモ用コードの様子。本流にマージ。
+　　あとで理解する。★
+　　　demo_runner
+　　　include　　　←インクルードパスを追加しておく
+　　　mqtt
+　　　tcp
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\renesas\rx65n_envision_kit\common\application_code\renesas_code
+　  \entropy_hardware_poll.c
+　  Amazon FreeRTOSが要求するエントロピーソース(乱数性)の実装。
+　  現在は固定値が返るように実装されているが、
+　  NetworkInterface.cにget_random_number()関数があるのであとでそこに繋ぐよう変更。
+　  最終的にget_random_number()は暗号IPがあるチップのときは暗号IPの乱数器から
+　  乱数を取得するように変更する。暗号IPがないチップのときは疑似乱数にする。★
+　  
+　  ついでに、NetworkInterface.cの uRand()の実装がバグっていたので修正。
+　  uint32_t ulRand(void)
+    {
+	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
+	uint32_t tmp;
+	get_random_number(tmp, 4);
+	return tmp;
+    }
+    ↓
+　  uint32_t ulRand(void)
+    {
+	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
+	uint32_t tmp;
+	get_random_number(&tmp, 4);
+	return tmp;
+    }
+
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\renesas\rx65n_envision_kit\common\config_files
+　 　以下コンフィグファイルが増えている。本流にマージ。
+　 　aws_bufferpool_config.h
+　 　aws_demo_config.h
+　 　aws_mqtt_agent_config.h
+　 　aws_mqtt_config.h
+　 　aws_secure_sockets_config.h
+　 　
+　 　以下コンフィグファイルが変更されている。本流にマージ。あとで理解する。★
+　 　FreeRTOSConfig.h
+　 　
+　　 　追加：
+　　 　#define configSUPPORT_STATIC_ALLOCATION              1
+
+　　　/*********************************************
+　　　 * FreeRTOS specific demos
+　　　 ********************************************/
+
+　　　/* The address of an echo server that will be used by the two demo echo client
+　　　 * tasks.
+　　　 * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
+　　　 * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
+　　　#define configECHO_SERVER_ADDR0       192
+　　　#define configECHO_SERVER_ADDR1       168
+　　　#define configECHO_SERVER_ADDR2       0
+　　　#define configECHO_SERVER_ADDR3       1
+　　　#define configTCP_ECHO_CLIENT_PORT    8888
+
+　\rx65n_rsk_aws_\src\amazon-freertos-master
+　 \lib
+　 　以下フォルダが増えている。本流にマージ。
+　 　　bufferpool
+　 　　crypto
+　 　　mqtt
+　 　　pkcs11
+　 　　secure_sockets
+　 　　third_party
+　 　　　\mbedtls\include　←インクルードパスを追加しておく
+　 　　　 \mbedtls
+　 　　　\pkcs11　←インクルードパスを追加しておく
+　 　　tls
+　 　　utils
+　
+　\rx65n_rsk_aws_\src\smc_gen
+　　以下フォルダが増えている。これはルネサスのフラッシュAPIのFITモジュールだ。
+　　スマートコンフィグレータの機能でフラッシュAPIのモジュールを追加する。
+　　r_flash_rx
+　 
+　ここまでで支流を本流にマージ完了、シェルティの開発サーバにコミットする。(r5128)
+　
+　<<Amazon FreeRTOS本家とのズレ具合を確認>>
+　最新版v1.2.2をダウンロードする。本家と呼称する。
+　　https://github.com/aws/amazon-freertos
+
+　amazon-freertos-masterフォルダ全体をgrepして本家と本流の差分確認する。
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \common
+　  本流には以下フォルダが足りていない。最終的にはどうするか検討。★
+　  　devmode_key_provisioning
+　  　greengrass_connectivity
+　  　logging
+　  　ota
+　  　shadow
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \renesas\rx65n_envision_kit\common\application_code\renesas_code
+　  本家は各マイコン用のBSPや標準デバイスドライバ、main関数、
+　  プロジェクトファイル等はここに登録されている。最終的にはルネサスも引っ越す。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　　ライセンス関係の以下ファイルが抜けている。登録した。
+　　　change_log.txt
+　　　directories.txt
+　　　LICENSE
+　　　README.md
+　　　
+　\rx65n_rsk_aws\src\amazon-freertos-master\demos
+　 \common\include
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　(RXマイコン用テストアカウントデータは残す)
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master
+　 \demos\common\demo_runner
+　  aws_demo_runner.c
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　★マークのところ（協力会社による調整コード）は残す。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS\portable\Renesas\RX600v2
+　  port.c
+　   インクルードファイルが、iodefine.h(本家)とplatform.h(本流)とで違う。
+　   いずれはAmazon本家にかけあい、本家コード修正が必要。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\include
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\portable\BufferManagement
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　　BufferAllocation_2.c が大幅に変わっている。要注意。あとで調べる。★
+　 　　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\portable\Compiler\Renesas
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　 　構造体 pack の調整コード。
+　   いずれはAmazon本家にかけあい、本家コード修正が必要。★
+　
+　\rx65n_rsk_aws\src\amazon-freertos-master\lib
+　 \FreeRTOS-Plus-TCP\source\protocols
+　 　Amazon FreeRTOS v1.2.2の最新コードに置き換え。
+　
+　ここまでで本家 v1.2.2を本流にマージ完了。
+　シェルティの開発サーバにコミットする。(r5129)
+　
+　RX65N Envision Kitの環境もメンテする。
+　　RX65N Envision KitのほうはDHCPの最初の1回目のパケットが相変わらずコケている。
+　　DHCPの再送を待ってDHCP完了してからでないとデモアプリのMQTT通信に
+　　失敗するので、rx65n_envision_kit_aws.c においてDEMO_RUNNER_RunDemos()を
+　　呼び出すまでのウェイトを2秒から10秒に変更。
+　シェルティの開発サーバにコミットする。(r5130)
+　
+
 --------------------------------------------------------------------------
 2018/03/03
 　rx65n_rsk_awsで実験開始。
@@ -98,15 +395,15 @@ IDE：e2 studio V6.2.0
 　　　　(3)ソフトウェアループ　＜適当＞
 　　　　(4)受信タスク開始
 　　　　(5)MAC層リンクチェック開始
-　　　　(6)xNetworkInterfaceInitialise()終了→xNetworkInterfaceOutput()失敗（まだMAC層準備完了してない）
-　　　　　　→DHCPタイムアウト→xNetworkInterfaceOutput()成功
+　　　　(6)xNetworkInterfaceInitialise()終了→DHCP送信→xNetworkInterfaceOutput()失敗（まだMAC層準備完了してない）
+　　　　　　→DHCPタイムアウト→DHCP再送→xNetworkInterfaceOutput()成功
 
 　　　整理後：
 　　　　(1)lan_open() (MAC/PHYの初期化、オートネゴシエーション開始)
 　　　　(2)MAC層リンクチェック開始
 　　　　(3)MAC層リンク完了待ち
 　　　　(4)受信タスク開始
-　　　　(5)xNetworkInterfaceInitialise()終了→xNetworkInterfaceOutput()成功
+　　　　(5)xNetworkInterfaceInitialise()終了→DHCP送信→xNetworkInterfaceOutput()成功
 　　　　　　まだ完ぺきではなくて、動作中にLANケーブルが
 　　　　　　抜けたりささったりする動作に対応できてない。(活線挿抜）
 　　　　　　現時点で、LANケーブルの挿抜に応じてEtherドライバはコールバックできるが、
