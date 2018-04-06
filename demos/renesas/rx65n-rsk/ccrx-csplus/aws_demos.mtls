@@ -129,8 +129,8 @@ freertos_usr_func.obj
 lcd_conf.obj
 r_ascii.obj
 r_simple_graphic.obj
-hwsetup.obj
 dbsct.obj
+hwsetup.obj
 lowlvl.obj
 lowsrc.obj
 resetprg.obj

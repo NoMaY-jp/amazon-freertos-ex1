@@ -253,25 +253,11 @@
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
       <ParentItem>59e5ac00-fe44-468b-a21b-124da57d9fca</ParentItem>
     </Instance>
-    <Instance Guid="139ebc82-c0de-4ee6-bfbb-a5b25ea42b62">
-      <Name>croutine.h</Name>
-      <Type>File</Type>
-      <RelativePath>..\common\application_code\croutine.h</RelativePath>
-      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
-      <ParentItem>e83d6db0-3a22-4228-8868-770658742f70</ParentItem>
-    </Instance>
     <Instance Guid="f111b709-bcee-48fc-8965-d7dc0291106e">
       <Name>helper.c</Name>
       <Type>File</Type>
       <RelativePath>..\common\application_code\helper.c</RelativePath>
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
-      <ParentItem>e83d6db0-3a22-4228-8868-770658742f70</ParentItem>
-    </Instance>
-    <Instance Guid="c63cc810-7f7d-4e82-b7c5-d47a13589248">
-      <Name>iodefine.h</Name>
-      <Type>File</Type>
-      <RelativePath>..\common\application_code\iodefine.h</RelativePath>
-      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
       <ParentItem>e83d6db0-3a22-4228-8868-770658742f70</ParentItem>
     </Instance>
     <Instance Guid="3170d8e2-7a1f-499b-ac7c-cb66d279bdc6">
@@ -2643,9 +2629,10 @@
       <ParentItem>df943785-c7a6-47b6-8b38-96a789034a91</ParentItem>
     </Instance>
     <Instance Guid="59ee01d5-12cb-496f-a39e-2fe37481083a">
-      <Name>hwsetup</Name>
+      <Name>alternative</Name>
       <Type>Category</Type>
       <ParentItem>df943785-c7a6-47b6-8b38-96a789034a91</ParentItem>
+      <Property>01bf05da-9566-4a66-ab4c-fe5c50ca5a05</Property>
     </Instance>
     <Instance Guid="450ee5f1-7571-4ed0-b9fd-68015862d36d">
       <Name>r_bsp_rtos</Name>
@@ -2657,11 +2644,25 @@
       <Type>Category</Type>
       <ParentItem>df943785-c7a6-47b6-8b38-96a789034a91</ParentItem>
     </Instance>
-    <Instance Guid="ae860676-5411-48d7-8853-06eb031a3d4d">
+    <Instance Guid="9cf9f8de-a5ac-4b7c-b048-28fce42b671d">
       <Name>hwsetup.c</Name>
       <Type>File</Type>
-      <RelativePath>src\realtime_OS_pkg\hwsetup\hwsetup.c</RelativePath>
+      <RelativePath>src\realtime_OS_pkg\alternative\hwsetup.c</RelativePath>
       <TreeImageGuid>941832c1-fc3b-4e1b-94e8-01ea17128b42</TreeImageGuid>
+      <ParentItem>59ee01d5-12cb-496f-a39e-2fe37481083a</ParentItem>
+    </Instance>
+    <Instance Guid="f53643e7-95f1-4b40-aec0-c56d357a8f41">
+      <Name>platform.h</Name>
+      <Type>File</Type>
+      <RelativePath>src\realtime_OS_pkg\alternative\platform.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
+      <ParentItem>59ee01d5-12cb-496f-a39e-2fe37481083a</ParentItem>
+    </Instance>
+    <Instance Guid="608d43cb-53cc-44e8-8fc4-ce34cace260b">
+      <Name>r_bsp.h</Name>
+      <Type>File</Type>
+      <RelativePath>src\realtime_OS_pkg\alternative\r_bsp.h</RelativePath>
+      <TreeImageGuid>03cad1e8-2eb3-4cde-a8a3-982423631122</TreeImageGuid>
       <ParentItem>59ee01d5-12cb-496f-a39e-2fe37481083a</ParentItem>
     </Instance>
     <Instance Guid="c96d7a13-0573-44c8-b380-3af85d074c28">
@@ -3984,6 +3985,11 @@
       <MemoCount>0</MemoCount>
     </Instance>
   </Class>
+  <Class Guid="78a5c5cd-76cb-4bcc-a031-3020011fbc9a">
+    <Instance Guid="01bf05da-9566-4a66-ab4c-fe5c50ca5a05">
+      <MemoCount>0</MemoCount>
+    </Instance>
+  </Class>
   <Class Guid="8fb9c1f6-d351-4d10-8d99-bf5b3015b84c">
     <Instance Guid="00000000-0000-0000-0000-000000000000">
       <UsingPlatformGuid>500ba51a-4219-4828-b4be-80f54d6d3551</UsingPlatformGuid>
@@ -4292,7 +4298,7 @@
       <SourceItemType135>CSource</SourceItemType135>
       <SourceItemGuid136>56fbe44d-19c1-42ef-a081-c047b74314cd</SourceItemGuid136>
       <SourceItemType136>CSource</SourceItemType136>
-      <SourceItemGuid137>ae860676-5411-48d7-8853-06eb031a3d4d</SourceItemGuid137>
+      <SourceItemGuid137>9cf9f8de-a5ac-4b7c-b048-28fce42b671d</SourceItemGuid137>
       <SourceItemType137>CSource</SourceItemType137>
       <SourceItemGuid138>578c17dd-7c05-415c-90ec-f68a1f8248d7</SourceItemGuid138>
       <SourceItemType138>CSource</SourceItemType138>
@@ -4497,7 +4503,7 @@
       <TimeTagModified--1>-8586802352458437728</TimeTagModified--1>
       <OutputMessageFormat-1>%TargetFiles%</OutputMessageFormat-1>
       <FormatBuildOptionList-1>%TargetFiles% : %Program% %Options%</FormatBuildOptionList-1>
-      <PreBuildCommands-1>@(echo 'Use r_bsp_rtos and r_cmt_rtos_rx instead of r_bsp and r_cmt_rx') &amp;&amp; @(if exist src\smc_gen\r_bsp echo renaming folder: r_bsp --^&gt; r_bsp__unused &amp;&amp; ren src\smc_gen\r_bsp r_bsp__unused) &amp;&amp; @(if exist src\smc_gen\r_cmt_rx echo renaming folder: r_cmt_rx --^&gt; r_cmt_rx__unused &amp;&amp; ren src\smc_gen\r_cmt_rx r_cmt_rx__unused)
+      <PreBuildCommands-1>@src\realtime_OS_pkg\alternative\.pre-build.bat
 </PreBuildCommands-1>
       <PostBuildCommands-1 />
       <GeneralOptionIsa-0>RXv2</GeneralOptionIsa-0>
@@ -4878,6 +4884,8 @@ src\smc_gen\general
 ..\..\..\..\lib\third_party\tinycbor
 ..\..\..\..\lib\third_party\mbedtls\include
 src\realtime_OS_pkg\r_bsp_rtos
+src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb
+src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access
 src\realtime_OS_pkg\r_cmt_rtos_rx
 src\realtime_OS_pkg\r_cmt_rtos_rx\src
 src\FreeRTOS_user
@@ -6339,14 +6347,14 @@ D_2=R_2
       <ItemAddTime>636569983439747168</ItemAddTime>
       <ItemAddTimeCount>2</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="ae860676-5411-48d7-8853-06eb031a3d4d">
-      <LinkOrder-1>131</LinkOrder-1>
-      <ItemAddTime>636569983439947456</ItemAddTime>
-      <ItemAddTimeCount>1</ItemAddTimeCount>
-    </Instance>
     <Instance Guid="578c17dd-7c05-415c-90ec-f68a1f8248d7">
-      <LinkOrder-1>132</LinkOrder-1>
+      <LinkOrder-1>131</LinkOrder-1>
       <ItemAddTime>636569983440548320</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
+    <Instance Guid="da874d0b-bb60-4892-bfef-b189e83de77d">
+      <LinkOrder-1>132</LinkOrder-1>
+      <ItemAddTime>636569983440648464</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
     </Instance>
     <Instance Guid="b1a50c64-552f-4f91-8da5-ac38d70d5d60">
@@ -6524,6 +6532,10 @@ D_2=R_2
       <ItemAddTime>636570005421760848</ItemAddTime>
       <ItemAddTimeCount>2</ItemAddTimeCount>
     </Instance>
+    <Instance Guid="9cf9f8de-a5ac-4b7c-b048-28fce42b671d">
+      <ItemAddTime>636585641230971984</ItemAddTime>
+      <ItemAddTimeCount>0</ItemAddTimeCount>
+    </Instance>
     <Instance Guid="4df5d4ed-e2ca-44be-88bf-f9745b3c48be">
       <ItemAddTime>636569983426327872</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
@@ -6580,12 +6592,12 @@ D_2=R_2
       <ItemAddTime>636569983427129024</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="139ebc82-c0de-4ee6-bfbb-a5b25ea42b62">
-      <ItemAddTime>636569983428130464</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
+    <Instance Guid="608d43cb-53cc-44e8-8fc4-ce34cace260b">
+      <ItemAddTime>636585641230971984</ItemAddTime>
+      <ItemAddTimeCount>2</ItemAddTimeCount>
     </Instance>
-    <Instance Guid="c63cc810-7f7d-4e82-b7c5-d47a13589248">
-      <ItemAddTime>636569983428230608</ItemAddTime>
+    <Instance Guid="f53643e7-95f1-4b40-aec0-c56d357a8f41">
+      <ItemAddTime>636585641230971984</ItemAddTime>
       <ItemAddTimeCount>1</ItemAddTimeCount>
     </Instance>
     <Instance Guid="9a999a92-4c0f-46e7-8986-e863a68de355">
@@ -7286,10 +7298,6 @@ D_2=R_2
     </Instance>
     <Instance Guid="c172a494-0552-401d-9a61-96b2a78efc39">
       <ItemAddTime>636569983440448176</ItemAddTime>
-      <ItemAddTimeCount>0</ItemAddTimeCount>
-    </Instance>
-    <Instance Guid="da874d0b-bb60-4892-bfef-b189e83de77d">
-      <ItemAddTime>636569983440648464</ItemAddTime>
       <ItemAddTimeCount>0</ItemAddTimeCount>
     </Instance>
     <Instance Guid="ecbc448e-f059-4eb6-a163-a29aae2a3665">
@@ -8701,12 +8709,12 @@ D_2=R_2
       <TimeTagModified-SourceItem136--1>-8586802377407818272</TimeTagModified-SourceItem136--1>
       <SourceItem136-BuildingTarget-1>True</SourceItem136-BuildingTarget-1>
       <SourceItem136-IndividualCompileOption-1>False</SourceItem136-IndividualCompileOption-1>
-      <TimeTagModified-SourceItem137--0>-8586802377414828352</TimeTagModified-SourceItem137--0>
+      <TimeTagModified-SourceItem137--0>-8586786719623803824</TimeTagModified-SourceItem137--0>
       <SourceItem137-IsLockedByUser>False</SourceItem137-IsLockedByUser>
       <SourceItem137-BuildingTarget-0>True</SourceItem137-BuildingTarget-0>
       <SourceItem137-IndividualCompileOption-0>False</SourceItem137-IndividualCompileOption-0>
-      <TimeTagModified-SourceItem137--1>-8586802377407818272</TimeTagModified-SourceItem137--1>
-      <SourceItem137-BuildingTarget-1>True</SourceItem137-BuildingTarget-1>
+      <TimeTagModified-SourceItem137--1>-8586786719482901216</TimeTagModified-SourceItem137--1>
+      <SourceItem137-BuildingTarget-1>False</SourceItem137-BuildingTarget-1>
       <SourceItem137-IndividualCompileOption-1>False</SourceItem137-IndividualCompileOption-1>
       <TimeTagModified-SourceItem138--0>-8586802377414227488</TimeTagModified-SourceItem138--0>
       <SourceItem138-IsLockedByUser>False</SourceItem138-IsLockedByUser>
@@ -8719,8 +8727,8 @@ D_2=R_2
       <SourceItem139-IsLockedByUser>False</SourceItem139-IsLockedByUser>
       <SourceItem139-BuildingTarget-0>True</SourceItem139-BuildingTarget-0>
       <SourceItem139-IndividualCompileOption-0>False</SourceItem139-IndividualCompileOption-0>
-      <TimeTagModified-SourceItem139--1>-8586802377407818272</TimeTagModified-SourceItem139--1>
-      <SourceItem139-BuildingTarget-1>False</SourceItem139-BuildingTarget-1>
+      <TimeTagModified-SourceItem139--1>-8586786715831851264</TimeTagModified-SourceItem139--1>
+      <SourceItem139-BuildingTarget-1>True</SourceItem139-BuildingTarget-1>
       <SourceItem139-IndividualCompileOption-1>False</SourceItem139-IndividualCompileOption-1>
       <TimeTagModified-SourceItem140--0>-8586802377413927056</TimeTagModified-SourceItem140--0>
       <SourceItem140-IsLockedByUser>False</SourceItem140-IsLockedByUser>

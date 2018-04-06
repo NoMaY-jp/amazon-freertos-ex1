@@ -51,9 +51,7 @@
           <Path>..\..\..\common\tcp\aws_tcp_echo_client_single_task.c</Path>
         </Category>
         <Category Name="application_code">
-          <Path>..\common\application_code\croutine.h</Path>
           <Path>..\common\application_code\helper.c</Path>
-          <Path>..\common\application_code\iodefine.h</Path>
           <Path>..\common\application_code\main.c</Path>
           <Path>..\common\application_code\time.h</Path>
           <Category Name="renesas_code">
@@ -476,8 +474,10 @@
         </Category>
         <Category Name="realtime_OS_pkg">
           <Path>src\realtime_OS_pkg\get!.txt</Path>
-          <Category Name="hwsetup">
-            <Path>src\realtime_OS_pkg\hwsetup\hwsetup.c</Path>
+          <Category Name="alternative">
+            <Path>src\realtime_OS_pkg\alternative\hwsetup.c</Path>
+            <Path>src\realtime_OS_pkg\alternative\platform.h</Path>
+            <Path>src\realtime_OS_pkg\alternative\r_bsp.h</Path>
           </Category>
           <Category Name="r_bsp_rtos">
             <Path>src\realtime_OS_pkg\r_bsp_rtos\platform.h</Path>
@@ -876,7 +876,6 @@
           <Path>DefaultBuild\r_simple_graphic.obj</Path>
           <Path>DefaultBuild\rx65n_rsk_aws.obj</Path>
           <Path>DefaultBuild\freertos_usr_func.obj</Path>
-          <Path>DefaultBuild\hwsetup.obj</Path>
           <Path>DefaultBuild\dbsct.obj</Path>
           <Path>DefaultBuild\hwsetup.obj</Path>
           <Path>DefaultBuild\lowlvl.obj</Path>
@@ -1038,7 +1037,7 @@
       </BuildMode>
       <BuildMode Name="HardwareDebug" Active="True">
         <GeneralOptions>
-          <CommandsBefore>@(echo 'Use r_bsp_rtos and r_cmt_rtos_rx instead of r_bsp and r_cmt_rx') &amp;&amp; @(if exist src\smc_gen\r_bsp echo renaming folder: r_bsp --^&gt; r_bsp__unused &amp;&amp; ren src\smc_gen\r_bsp r_bsp__unused) &amp;&amp; @(if exist src\smc_gen\r_cmt_rx echo renaming folder: r_cmt_rx --^&gt; r_cmt_rx__unused &amp;&amp; ren src\smc_gen\r_cmt_rx r_cmt_rx__unused)</CommandsBefore>
+          <CommandsBefore>@src\realtime_OS_pkg\alternative\.pre-build.bat</CommandsBefore>
           <SimultaneouslyBuild>true</SimultaneouslyBuild>
         </GeneralOptions>
         <CompileOptions>
@@ -1085,6 +1084,8 @@
           <Option>-include=..\..\..\..\lib\third_party\tinycbor</Option>
           <Option>-include=..\..\..\..\lib\third_party\mbedtls\include</Option>
           <Option>-include=src\realtime_OS_pkg\r_bsp_rtos</Option>
+          <Option>-include=src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb</Option>
+          <Option>-include=src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access</Option>
           <Option>-include=src\realtime_OS_pkg\r_cmt_rtos_rx</Option>
           <Option>-include=src\realtime_OS_pkg\r_cmt_rtos_rx\src</Option>
           <Option>-include=src\FreeRTOS_user</Option>
@@ -1132,7 +1133,7 @@
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\NTP\NTPDemo.c" />
         <NoTargetFile Target="..\..\..\..\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c" />
         <NoTargetFile Target="src\rx65n_rsk_aws.c" />
-        <NoTargetFile Target="src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.c" />
+        <NoTargetFile Target="src\realtime_OS_pkg\alternative\hwsetup.c" />
         <NoTargetFile Target="src\smc_gen\r_bsp\board\generic_rx65n\dbsct.c" />
         <NoTargetFile Target="src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.c" />
         <NoTargetFile Target="src\smc_gen\r_bsp\board\generic_rx65n\lowlvl.c" />
@@ -1282,8 +1283,8 @@
           <Path>HardwareDebug\lcd_conf.obj</Path>
           <Path>HardwareDebug\r_ascii.obj</Path>
           <Path>HardwareDebug\r_simple_graphic.obj</Path>
-          <Path>HardwareDebug\hwsetup.obj</Path>
           <Path>HardwareDebug\dbsct.obj</Path>
+          <Path>HardwareDebug\hwsetup.obj</Path>
           <Path>HardwareDebug\lowlvl.obj</Path>
           <Path>HardwareDebug\lowsrc.obj</Path>
           <Path>HardwareDebug\resetprg.obj</Path>
@@ -1360,6 +1361,8 @@
           <IncludePathForC>..\..\..\..\lib\third_party\tinycbor</IncludePathForC>
           <IncludePathForC>..\..\..\..\lib\third_party\mbedtls\include</IncludePathForC>
           <IncludePathForC>src\realtime_OS_pkg\r_bsp_rtos</IncludePathForC>
+          <IncludePathForC>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb</IncludePathForC>
+          <IncludePathForC>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access</IncludePathForC>
           <IncludePathForC>src\realtime_OS_pkg\r_cmt_rtos_rx</IncludePathForC>
           <IncludePathForC>src\realtime_OS_pkg\r_cmt_rtos_rx\src</IncludePathForC>
           <IncludePathForC>src\FreeRTOS_user</IncludePathForC>

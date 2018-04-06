@@ -1,4 +1,4 @@
-#include "../r_bsp_rtos/platform.h"
+#include "platform.h"
 #include "r_cg_macrodriver.h"
 
 static void output_ports_configure(void);
