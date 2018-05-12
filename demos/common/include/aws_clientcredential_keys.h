@@ -6,7 +6,27 @@
  * "...base64 data..."
  * "-----END CERTIFICATE-----";
  */
-static const char clientcredentialCLIENT_CERTIFICATE_PEM[] = "Paste client certificate here.";
+static const char clientcredentialCLIENT_CERTIFICATE_PEM[] =
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIDWTCCAkGgAwIBAgIUU4uLbHwNNKCllpQOAsoY3Vwm/FAwDQYJKoZIhvcNAQEL\n"
+		"BQAwTTFLMEkGA1UECwxCQW1hem9uIFdlYiBTZXJ2aWNlcyBPPUFtYXpvbi5jb20g\n"
+		"SW5jLiBMPVNlYXR0bGUgU1Q9V2FzaGluZ3RvbiBDPVVTMB4XDTE4MDQyOTIzNDAx\n"
+		"N1oXDTQ5MTIzMTIzNTk1OVowHjEcMBoGA1UEAwwTQVdTIElvVCBDZXJ0aWZpY2F0\n"
+		"ZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANTsHusabpiUzvbNA/rp\n"
+		"B+cuAISP9zVaWb60HAhprGT0M0UQtOSQVAg0X+Aawh/zRJjLgb2J0VzW1iPiPeWy\n"
+		"j5DPievaDLQWHKPZ7oVH3qvhQZ7e7dPBkhrUbuRohSrtPPiDf2fMMoP4B2jFJrF+\n"
+		"n+RdNkKkkGeZyamANEsMQCRoqJRG7hBa0rMY8jH8OpDGxhBrtWBaJWV70b1VL/2p\n"
+		"gq1ij1163yuFxEtzfo9vT+MR8jPlhLR9Q/qmeeUj2oT6ZrfVlaJLjb0bEdVxtf4R\n"
+		"PSDmUSlVYvnM1rctDQ4rehiYHVlv5dQm8xc6rLtbQgiI3fUmKN22WYPQBvFxsv7d\n"
+		"NScCAwEAAaNgMF4wHwYDVR0jBBgwFoAULttS39Jx3ZLhdjpTV8JBpqF6RcowHQYD\n"
+		"VR0OBBYEFCLfCrE7cvwvJI7OKsSROPCyPh0dMAwGA1UdEwEB/wQCMAAwDgYDVR0P\n"
+		"AQH/BAQDAgeAMA0GCSqGSIb3DQEBCwUAA4IBAQAUpIvdajR9EmpkvouD9p1wciL/\n"
+		"9ha+3Pw57aerG+HY0XsqUT9Fr9X1yAVMeDBkAFUw1BK96Zl4P+4Qku8Qov04Ivk4\n"
+		"doxWyFkCKufdYHxqQtsoy2/1xdyY1Z2KXBh/Ikn1b5PZbx3N1fben//FfSW5eSdg\n"
+		"cA5j4/guhnS/5SDmHaINxWuYYv7zuEq/79A8NGburjjZB6lPCpgcSHJCcfH3C15i\n"
+		"tW3zIHwHS1rnmdzPgjKBmklbLwHNlLFDJrMJMQMr7mju93jtKm9iXOXL5nTZQWdV\n"
+		"FyIA/3ITDaPm6Ql33L9U+zcImH48r83ZSZk8V0xP/5nIg2wYKz3BvkVxz5Ii\n"
+		"-----END CERTIFICATE-----\n";
 
 
 
@@ -18,5 +38,32 @@ static const char clientcredentialCLIENT_CERTIFICATE_PEM[] = "Paste client certi
  * "...base64 data..."
  * "-----END RSA PRIVATE KEY-----";
  */
-static const char clientcredentialCLIENT_PRIVATE_KEY_PEM[] = "Paste client private key here.";
+static const char clientcredentialCLIENT_PRIVATE_KEY_PEM[] =
+		"-----BEGIN RSA PRIVATE KEY-----\n"
+		"MIIEowIBAAKCAQEA1Owe6xpumJTO9s0D+ukH5y4AhI/3NVpZvrQcCGmsZPQzRRC0\n"
+		"5JBUCDRf4BrCH/NEmMuBvYnRXNbWI+I95bKPkM+J69oMtBYco9nuhUfeq+FBnt7t\n"
+		"08GSGtRu5GiFKu08+IN/Z8wyg/gHaMUmsX6f5F02QqSQZ5nJqYA0SwxAJGiolEbu\n"
+		"EFrSsxjyMfw6kMbGEGu1YFolZXvRvVUv/amCrWKPXXrfK4XES3N+j29P4xHyM+WE\n"
+		"tH1D+qZ55SPahPpmt9WVokuNvRsR1XG1/hE9IOZRKVVi+czWty0NDit6GJgdWW/l\n"
+		"1CbzFzqsu1tCCIjd9SYo3bZZg9AG8XGy/t01JwIDAQABAoIBACa14w0lWhQdgd82\n"
+		"+NFGSqyKHYf8UJp/ma9lOW+CHtif2S5mUiz33H89Xmz1EHQUm1UYMrdN9iVl3bra\n"
+		"aBx5sUZHpTCfDQ40svJLLeVHYsFnC7Ihn6WPHMwJ8TtPkV5zkVExPxmU814w2s/+\n"
+		"gAFnHxS6qaHGH4bmW9aYO2mliYfUtjQXRuV+d2CIQt9hcB6QjXLO2Qdloi1+1Ckg\n"
+		"PLh4P6+RMkoGAaoml/rRMWNjiq+5HrIJPFhvZuO72N5fuQuhBKevdGlUGT6RFMOS\n"
+		"ySDO9nJqAj9/mHXkvcxdkSi1bbLbSGumUZiXwW40lK6JYkSTLZ2F6xMYqRn5ks1n\n"
+		"DovhLrkCgYEA+Z5SmquNIIR0o2AiGc2FozEpcBBvkhyujHBCVeytyGBJOaiNG/E8\n"
+		"7dtDo6wqq32vxD2uQfIxnEUh8puQ+iL++6IcReWZGmihvOKJxOir62W2CPkJ31hB\n"
+		"8m+fEJ0w4A5XnWuOfZGY+/B/yZJA/eqsx1bjRry4eBkG5RlWXunrQOUCgYEA2l2i\n"
+		"GdbGwkvesmQu66wDn3V6sfsORZyH4T50dr68xZXD+dR2kVA8t44BUB8r2KSkHA+c\n"
+		"/I0lUWYXY/tgDeGrUG19aGK56kfw3sOwxfiJ7NO8nHcoV+BBI3dUoUW3R2ENybZC\n"
+		"lLymM1rEiWm6yeLqVEQ/N8qVJ+XBGfWhgbJrGRsCgYEAhFJ2LYGlNUih3/1U9mKp\n"
+		"ZeHounwr+MN1kALuV0g4s1C/YG5GJzrRdrFWAMyCbhgZdajQ2CqAO/u1zDrFNqQY\n"
+		"kOHVpQPaDlLK8isQpy5D/GwVfFov7pKFmvOq2Y7KWuufbFaY2V22QE+0HfGGvFOL\n"
+		"tbwMjPH7w8ZYjlfJHlVYHTUCgYA0kJWU4r61xs2046jn0mCM4hrG/UhSOXv8HKys\n"
+		"aP3IEmU6nopsMIRtKyHlx5sma3uVxaxknxV8ora+uqREsy4qDjFCD4Hxg5/YAANt\n"
+		"pIaPG+krQQPVI4aKow8cQ0v7QsGu7NDaPQ9FDXSCH5F3R8hgwIz3QSzmjcgOF7Lp\n"
+		"JaniQQKBgCgWkUGenw102wsW0xOwEDczATLw6DzH14yMlLDKuJHuJp2RHowhoDrQ\n"
+		"0e8LGBC8BLa+EGqxVBX7mu7B23HdoLXFNSOUUXip6v3EU5Tw7GDobTdx5FAi/QPs\n"
+		"6n6MIFt7ZDQ8nt0m68/RfSIY59Ci72zDAT6/HkUODVNeElKhl35c\n"
+		"-----END RSA PRIVATE KEY-----\n";
 

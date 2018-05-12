@@ -225,6 +225,11 @@
 			<locationURI>AWS_IOT_MCU_ROOT/demos/common/tcp/aws_tcp_echo_client_single_task.c</locationURI>
 		</link>
 		<link>
+			<name>lib/aws/ota/aws_ota_agent.c</name>
+			<type>1</type>
+			<locationURI>AWS_IOT_MCU_ROOT/lib/ota/aws_ota_agent.c</locationURI>
+		</link>
+		<link>
 			<name>lib/aws/ota/aws_ota_cbor.c</name>
 			<type>1</type>
 			<locationURI>AWS_IOT_MCU_ROOT/lib/ota/aws_ota_cbor.c</locationURI>
@@ -233,11 +238,6 @@
 			<name>lib/aws/ota/aws_rsprintf.c</name>
 			<type>1</type>
 			<locationURI>AWS_IOT_MCU_ROOT/lib/ota/aws_rsprintf.c</locationURI>
-		</link>
-		<link>
-			<name>lib/aws/ota/aws_ota_agent.c</name>
-			<type>1</type>
-			<locationURI>AWS_IOT_MCU_ROOT/lib/ota/aws_ota_agent.c</locationURI>
 		</link>
 		<link>
 			<name>lib/third_party/mbedtls/include</name>

@@ -28,12 +28,463 @@
  * @brief PKCS11 Interface.
  */
 
-/* Amazon FreeRTOS Includes. */
+/* FreeRTOS includes. */
+#include "FreeRTOS.h"
+#include "FreeRTOSIPConfig.h"
+#include "task.h"
+#include "aws_crypto.h"
 #include "aws_pkcs11.h"
+
+/* mbedTLS includes. */
+#include "mbedtls/pk.h"
+#include "mbedtls/pk_internal.h"
+#include "mbedtls/x509_crt.h"
+#include "mbedtls/ctr_drbg.h"
+#include "mbedtls/entropy.h"
+#include "mbedtls/sha256.h"
+#include "mbedtls/base64.h"
+#include "aws_clientcredential.h"
 
 /* C runtime includes. */
 #include <stdio.h>
 #include <string.h>
+
+/* Renesas */
+#include "r_flash_rx_if.h"
+
+/**
+ * @brief File storage location definitions.
+ */
+#define pkcs11FILE_NAME_CLIENT_CERTIFICATE    "FreeRTOS_P11_Certificate.dat"
+#define pkcs11FILE_NAME_KEY                   "FreeRTOS_P11_Key.dat"
+
+/**
+ * @brief Cryptoki module attribute definitions.
+ */
+#define pkcs11SLOT_ID                         1
+#define pkcs11OBJECT_HANDLE_PUBLIC_KEY        1
+#define pkcs11OBJECT_HANDLE_PRIVATE_KEY       2
+#define pkcs11OBJECT_HANDLE_CERTIFICATE       3
+
+#define pkcs11SUPPORTED_KEY_BITS              2048
+
+typedef int ( * pfnMbedTlsSign )( void * ctx,
+                                  mbedtls_md_type_t md_alg,
+                                  const unsigned char * hash,
+                                  size_t hash_len,
+                                  unsigned char * sig,
+                                  size_t * sig_len,
+                                  int ( *f_rng )( void *, unsigned char *, size_t ),
+                                  void * p_rng );
+
+/**
+ * @brief Key structure.
+ */
+typedef struct P11Key
+{
+    mbedtls_pk_context xMbedPkCtx;
+    mbedtls_x509_crt xMbedX509Cli;
+    mbedtls_pk_info_t xMbedPkInfo;
+    pfnMbedTlsSign pfnSavedMbedSign;
+    void * pvSavedMbedPkCtx;
+} P11Key_t, * P11KeyPtr_t;
+
+/**
+ * @brief Session structure.
+ */
+typedef struct P11Session
+{
+    P11KeyPtr_t pxCurrentKey;
+    CK_ULONG ulState;
+    CK_BBOOL xOpened;
+    CK_BBOOL xFindObjectInit;
+    CK_BBOOL xFindObjectComplete;
+    CK_OBJECT_CLASS xFindObjectClass;
+    mbedtls_ctr_drbg_context xMbedDrbgCtx;
+    mbedtls_entropy_context xMbedEntropyContext;
+} P11Session_t, * P11SessionPtr_t;
+
+/*-----------------------------------------------------------*/
+
+// XXX Renesas Ishiguro
+
+#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE     2048
+#define pkcs11OBJECT_FLASH_CERT_PRESENT       ( 0xABCDEFuL )
+/**
+ * @brief Structure for certificates/key storage.
+ */
+typedef struct
+{
+    CK_CHAR cDeviceCertificate[ pkcs11OBJECT_CERTIFICATE_MAX_SIZE ];
+    CK_CHAR cDeviceKey[ pkcs11OBJECT_CERTIFICATE_MAX_SIZE ];
+    CK_ULONG ulDeviceCertificateMark;
+    CK_ULONG ulDeviceKeyMark;
+} P11KeyConfig_t;
+
+#pragma section C UNINIT_FIXED_LOC
+P11KeyConfig_t P11KeyConfig;
+#pragma section
+
+int FLASH_update(uint32_t dst_addr, const void *data, uint32_t size);
+// XXX Renesas Ishiguro
+
+/**
+ * @brief Maps an opaque caller session handle into its internal state structure.
+ */
+static P11SessionPtr_t prvSessionPointerFromHandle( CK_SESSION_HANDLE xSession )
+{
+    return ( P11SessionPtr_t ) xSession; /*lint !e923 Allow casting integer type to pointer for handle. */
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Writes a file to local storage.
+ */
+static BaseType_t prvSaveFile( char * pcFileName,
+                               uint8_t * pucData,
+                               uint32_t ulDataSize )
+{
+	// XXX Renesas Ishiguro
+    CK_RV xResult = pdFALSE;
+    CK_RV xBytesWritten = 0;
+    CK_ULONG ulFlashMark = pkcs11OBJECT_FLASH_CERT_PRESENT;
+
+    /*
+     * write client certificate.
+     */
+
+    if( strncmp( pcFileName,
+                 pkcs11FILE_NAME_CLIENT_CERTIFICATE,
+                 strlen( pkcs11FILE_NAME_CLIENT_CERTIFICATE ) ) == 0 )
+    {
+        xBytesWritten = FLASH_update( ( uint32_t ) P11KeyConfig.cDeviceCertificate,
+                                      pucData,
+                                      ( ulDataSize + 1 ) ); /*Include '\0'*/
+
+        if( xBytesWritten == ( ulDataSize + 1 ) )
+        {
+            xResult = pdTRUE;
+
+            /*change flash written mark'*/
+            FLASH_update( ( uint32_t ) &P11KeyConfig.ulDeviceCertificateMark,
+                          &ulFlashMark,
+                          sizeof( CK_ULONG ) );
+        }
+    }
+
+    /*
+     * write client key.
+     */
+
+    if( strncmp( pcFileName,
+                 pkcs11FILE_NAME_KEY,
+                 strlen( pkcs11FILE_NAME_KEY ) ) == 0 )
+    {
+        xBytesWritten = FLASH_update( ( uint32_t ) P11KeyConfig.cDeviceKey,
+                                      pucData,
+                                      ulDataSize + 1 ); /*Include '\0'*/
+
+        if( xBytesWritten == ( ulDataSize + 1 ) )
+        {
+            xResult = pdTRUE;
+
+            /*change flash written mark'*/
+            FLASH_update( ( uint32_t ) &P11KeyConfig.ulDeviceKeyMark,
+                          &ulFlashMark,
+                          sizeof( CK_ULONG ) );
+        }
+    }
+
+    return xResult;
+    // XXX Renesas Ishiguro
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Reads a file from local storage.
+ */
+static BaseType_t prvReadFile( char * pcFileName,
+                               uint8_t ** ppucData,
+                               uint32_t * pulDataSize )
+{
+	// XXX Renesas Ishiguro
+	CK_RV xResult = pdFALSE;
+
+	/*
+	 * Read client certificate.
+	 */
+
+	if( strncmp( pcFileName,
+				 pkcs11FILE_NAME_CLIENT_CERTIFICATE,
+				 strlen( pkcs11FILE_NAME_CLIENT_CERTIFICATE ) ) == 0 )
+	{
+		/*
+		 * return reference and size only if certificates are present in flash
+		 */
+		if( P11KeyConfig.ulDeviceCertificateMark == pkcs11OBJECT_FLASH_CERT_PRESENT )
+		{
+			*ppucData = P11KeyConfig.cDeviceCertificate;
+			*pulDataSize = ( uint32_t ) strlen( ( const char * ) P11KeyConfig.cDeviceCertificate ) + 1;
+			xResult = pdTRUE;
+		}
+	}
+
+	/*
+	 * Read client key.
+	 */
+
+	if( strncmp( pcFileName,
+				 pkcs11FILE_NAME_KEY,
+				 strlen( pkcs11FILE_NAME_KEY ) ) == 0 )
+	{
+		/*
+		 * return reference and size only if certificates are present in flash
+		 */
+		if( P11KeyConfig.ulDeviceKeyMark == pkcs11OBJECT_FLASH_CERT_PRESENT )
+		{
+			*ppucData = P11KeyConfig.cDeviceKey;
+			*pulDataSize = ( uint32_t ) strlen( ( const char * ) P11KeyConfig.cDeviceKey ) + 1;
+			xResult = pdTRUE;
+		}
+	}
+
+	return xResult;
+	// XXX Renesas Ishiguro
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Sign a cryptographic hash with the private key.
+ *
+ * @param[in] pvContext Crypto context.
+ * @param[in] xMdAlg Unused.
+ * @param[in] pucHash Length in bytes of hash to be signed.
+ * @param[in] uiHashLen Byte array of hash to be signed.
+ * @param[out] pucSig RSA signature bytes.
+ * @param[in] pxSigLen Length in bytes of signature buffer.
+ * @param[in] piRng Unused.
+ * @param[in] pvRng Unused.
+ *
+ * @return Zero on success.
+ */
+static int prvPrivateKeySigningCallback( void * pvContext,
+                                         mbedtls_md_type_t xMdAlg,
+                                         const unsigned char * pucHash,
+                                         unsigned int uiHashLen,
+                                         unsigned char * pucSig,
+                                         size_t * pxSigLen,
+                                         int ( *piRng )( void *, unsigned char *, size_t ), /*lint !e955 This parameter is unused. */
+                                         void * pvRng )
+{
+    BaseType_t xResult = 0;
+    P11SessionPtr_t pxSession = ( P11SessionPtr_t ) pvContext;
+    CK_MECHANISM xMech = { 0 };
+
+    /* Unreferenced parameters. */
+    ( void ) ( piRng );
+    ( void ) ( pvRng );
+    ( void ) ( xMdAlg );
+
+    /* Use the PKCS#11 module to sign. */
+    xMech.mechanism = CKM_SHA256;
+
+    xResult = ( BaseType_t ) C_SignInit(
+        ( CK_SESSION_HANDLE ) pxSession,
+        &xMech,
+        ( CK_OBJECT_HANDLE ) pxSession->pxCurrentKey );
+
+    if( 0 == xResult )
+    {
+        xResult = ( BaseType_t ) C_Sign(
+            ( CK_SESSION_HANDLE ) pxSession,
+            ( CK_BYTE_PTR ) pucHash, /*lint !e9005 The interfaces are from 3rdparty libraries, we are not suppose to change them. */
+            uiHashLen,
+            pucSig,
+            ( CK_ULONG_PTR ) pxSigLen );
+    }
+
+    return xResult;
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Initializes a key structure.
+ */
+static CK_RV prvInitializeKey( P11SessionPtr_t pxSessionObj,
+                               const char * pcEncodedKey,
+                               const uint32_t ulEncodedKeyLength,
+                               const char * pcEncodedCertificate,
+                               const uint32_t ulEncodedCertificateLength )
+{
+    CK_RV xResult = 0;
+
+    /*
+     * Create the key structure, but allow an existing one to be used.
+     */
+
+    if( NULL == pxSessionObj->pxCurrentKey )
+    {
+        if( NULL == ( pxSessionObj->pxCurrentKey = ( P11KeyPtr_t ) pvPortMalloc(
+                          sizeof( P11Key_t ) ) ) ) /*lint !e9087 Allow casting void* to other types. */
+        {
+            xResult = CKR_HOST_MEMORY;
+        }
+    }
+
+    /*
+     * Initialize the key field, if requested.
+     */
+
+    if( ( CKR_OK == xResult ) && ( NULL != pcEncodedKey ) )
+    {
+        memset( pxSessionObj->pxCurrentKey, 0, sizeof( P11Key_t ) );
+        mbedtls_pk_init( &pxSessionObj->pxCurrentKey->xMbedPkCtx );
+
+        if( 0 != mbedtls_pk_parse_key(
+                &pxSessionObj->pxCurrentKey->xMbedPkCtx,
+                ( const unsigned char * ) pcEncodedKey,
+                ulEncodedKeyLength,
+                NULL,
+                0 ) )
+        {
+            xResult = CKR_FUNCTION_FAILED;
+        }
+
+        if( CKR_OK == xResult )
+        {
+            /* Swap out the signing function pointer. */
+            memcpy(
+                &pxSessionObj->pxCurrentKey->xMbedPkInfo,
+                pxSessionObj->pxCurrentKey->xMbedPkCtx.pk_info,
+                sizeof( pxSessionObj->pxCurrentKey->xMbedPkInfo ) );
+            pxSessionObj->pxCurrentKey->pfnSavedMbedSign = pxSessionObj->pxCurrentKey->xMbedPkInfo.sign_func;
+            pxSessionObj->pxCurrentKey->xMbedPkInfo.sign_func = prvPrivateKeySigningCallback;
+            pxSessionObj->pxCurrentKey->xMbedPkCtx.pk_info = &pxSessionObj->pxCurrentKey->xMbedPkInfo;
+
+            /* Swap out the underlying internal key context. */
+            pxSessionObj->pxCurrentKey->pvSavedMbedPkCtx = pxSessionObj->pxCurrentKey->xMbedPkCtx.pk_ctx;
+            pxSessionObj->pxCurrentKey->xMbedPkCtx.pk_ctx = pxSessionObj;
+        }
+    }
+
+    /*
+     * Initialize the certificate field, if requested.
+     */
+
+    if( ( CKR_OK == xResult ) && ( NULL != pcEncodedCertificate ) )
+    {
+        mbedtls_x509_crt_init( &pxSessionObj->pxCurrentKey->xMbedX509Cli );
+
+        if( 0 != mbedtls_x509_crt_parse(
+                &pxSessionObj->pxCurrentKey->xMbedX509Cli,
+                ( const unsigned char * ) pcEncodedCertificate,
+                ulEncodedCertificateLength ) )
+        {
+            xResult = CKR_FUNCTION_FAILED;
+        }
+    }
+
+    return xResult;
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Load the default key and certificate from storage.
+ */
+static CK_RV prvLoadAndInitializeDefaultCertificateAndKey( P11SessionPtr_t pxSession )
+{
+    CK_RV xResult = 0;
+    uint8_t * pucCertificateData = NULL;
+    uint32_t ulCertificateDataLength = 0;
+    BaseType_t xFreeCertificate = pdFALSE;
+    uint8_t * pucKeyData = NULL;
+    uint32_t ulKeyDataLength = 0;
+    BaseType_t xFreeKey = pdFALSE;
+
+    /* Read the certificate from storage. */
+    if( pdFALSE == prvReadFile( pkcs11FILE_NAME_CLIENT_CERTIFICATE,
+                                &pucCertificateData,
+                                &ulCertificateDataLength ) )
+    {
+        pucCertificateData = ( uint8_t * ) clientcredentialCLIENT_CERTIFICATE_PEM;
+        ulCertificateDataLength = clientcredentialCLIENT_CERTIFICATE_LENGTH;
+    }
+    else
+    {
+        xFreeCertificate = pdTRUE;
+    }
+
+    /* Read the private key from storage. */
+    if( pdFALSE == prvReadFile( pkcs11FILE_NAME_KEY,
+                                &pucKeyData,
+                                &ulKeyDataLength ) )
+    {
+        pucKeyData = ( uint8_t * ) clientcredentialCLIENT_PRIVATE_KEY_PEM;
+        ulKeyDataLength = clientcredentialCLIENT_PRIVATE_KEY_LENGTH;
+    }
+    else
+    {
+        xFreeKey = pdTRUE;
+    }
+
+    /* Attach the certificate and key to the session. */
+    xResult = prvInitializeKey( pxSession,
+                                ( const char * ) pucKeyData,
+                                ulKeyDataLength,
+                                ( const char * ) pucCertificateData,
+                                ulCertificateDataLength );
+
+    /* Stir the random pot. */
+    mbedtls_entropy_update_manual( &pxSession->xMbedEntropyContext,
+                                   pucKeyData,
+                                   ulKeyDataLength );
+    mbedtls_entropy_update_manual( &pxSession->xMbedEntropyContext,
+                                   pucCertificateData,
+                                   ulCertificateDataLength );
+
+    /* Clean-up. */
+    if( ( NULL != pucCertificateData ) && ( pdTRUE == xFreeCertificate ) )
+    {
+        vPortFree( pucCertificateData );
+    }
+
+    if( ( NULL != pucKeyData ) && ( pdTRUE == xFreeKey ) )
+    {
+        vPortFree( pucKeyData );
+    }
+
+    return xResult;
+}
+
+/*-----------------------------------------------------------*/
+
+/**
+ * @brief Cleans up a key structure.
+ */
+static void prvFreeKey( P11KeyPtr_t pxKey )
+{
+    if( NULL != pxKey )
+    {
+        /* Restore the internal key context. */
+        pxKey->xMbedPkCtx.pk_ctx = pxKey->pvSavedMbedPkCtx;
+
+        /* Clean-up. */
+        mbedtls_pk_free( &pxKey->xMbedPkCtx );
+        mbedtls_x509_crt_free( &pxKey->xMbedX509Cli );
+        vPortFree( pxKey );
+    }
+}
+
+/*-----------------------------------------------------------*/
+
+/*
+ * PKCS#11 module implementation.
+ */
 
 /**
  * @brief PKCS#11 interface functions implemented by this Cryptoki module.
@@ -112,169 +563,758 @@ static CK_FUNCTION_LIST prvP11FunctionList =
 };
 
 /**
- * @brief Hardware polling needed for third-party provided mbedTLS, if you are using 
- * mbedTLS as the underlying TLS support. See 
- * lib\third_party\mbedtls\include\mbedtls\entropy_poll.h for more information.
+ * @brief Initialize the Cryptoki module for use.
  */
-int mbedtls_hardware_poll( void *data, unsigned char *output, size_t len, size_t *olen );
-
-/*-----------------------------------------------------------*/
-
 CK_DEFINE_FUNCTION( CK_RV, C_Initialize )( CK_VOID_PTR pvInitArgs )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( pvInitArgs );
 
+    return CKR_OK;
+}
+
+/**
+ * @brief Un-initialize the Cryptoki module.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_Finalize )( CK_VOID_PTR pvReserved )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( pvReserved );
 
+    return CKR_OK;
+}
+
+/**
+ * @brief Query the list of interface function pointers.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_GetFunctionList )( CK_FUNCTION_LIST_PTR_PTR ppxFunctionList )
-{
+{   /*lint !e9072 It's OK to have different parameter name. */
     *ppxFunctionList = &prvP11FunctionList;
 
     return CKR_OK;
 }
-/*-----------------------------------------------------------*/
 
+/**
+ * @brief Query the list of slots. A single default slot is implemented.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_GetSlotList )( CK_BBOOL xTokenPresent,
                                             CK_SLOT_ID_PTR pxSlotList,
                                             CK_ULONG_PTR pulCount )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( xTokenPresent );
 
+    if( NULL == pxSlotList )
+    {
+        *pulCount = 1;
+    }
+    else
+    {
+        if( 0u == *pulCount )
+        {
+            return CKR_BUFFER_TOO_SMALL;
+        }
+
+        pxSlotList[ 0 ] = pkcs11SLOT_ID;
+        *pulCount = 1;
+    }
+
+    return CKR_OK;
+}
+
+/**
+ * @brief Start a session for a cryptographic command sequence.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_OpenSession )( CK_SLOT_ID xSlotID,
                                             CK_FLAGS xFlags,
                                             CK_VOID_PTR pvApplication,
                                             CK_NOTIFY xNotify,
                                             CK_SESSION_HANDLE_PTR pxSession )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSessionObj = NULL;
 
+    ( void ) ( xSlotID );
+    ( void ) ( pvApplication );
+    ( void ) ( xNotify );
+
+    /*
+     * Make space for the context.
+     */
+    if( NULL == ( pxSessionObj = ( P11SessionPtr_t ) pvPortMalloc( sizeof( P11Session_t ) ) ) ) /*lint !e9087 Allow casting void* to other types. */
+    {
+        xResult = CKR_HOST_MEMORY;
+    }
+
+    /*
+     * Assume that there's no performance tradeoff in loading the default key
+     * now, since that's the principal use case for opening a session in this
+     * provider anyway. This way, the private key can be used for seeding the RNG,
+     * especially if there's no hardware-based alternative.
+     */
+
+    if( CKR_OK == xResult )
+    {
+        memset( pxSessionObj, 0, sizeof( P11Session_t ) );
+        xResult = prvLoadAndInitializeDefaultCertificateAndKey( pxSessionObj );
+    }
+
+    /*
+     * Initialize RNG.
+     */
+
+    if( CKR_OK == xResult )
+    {
+        memset( &pxSessionObj->xMbedEntropyContext,
+                0,
+                sizeof( pxSessionObj->xMbedEntropyContext ) );
+
+        mbedtls_entropy_init( &pxSessionObj->xMbedEntropyContext );
+    }
+
+    if( CKR_OK == xResult )
+    {
+        mbedtls_ctr_drbg_init( &pxSessionObj->xMbedDrbgCtx );
+
+        if( 0 != mbedtls_ctr_drbg_seed( &pxSessionObj->xMbedDrbgCtx,
+                                        mbedtls_entropy_func,
+                                        &pxSessionObj->xMbedEntropyContext,
+                                        NULL,
+                                        0 ) )
+        {
+            xResult = CKR_FUNCTION_FAILED;
+        }
+    }
+
+    if( CKR_OK == xResult )
+    {
+        /*
+         * Assign the session.
+         */
+
+        pxSessionObj->ulState =
+            0u != ( xFlags & CKF_RW_SESSION ) ? CKS_RW_PUBLIC_SESSION : CKS_RO_PUBLIC_SESSION;
+        pxSessionObj->xOpened = CK_TRUE;
+
+        /*
+         * Return the session.
+         */
+
+        *pxSession = ( CK_SESSION_HANDLE ) pxSessionObj; /*lint !e923 Allow casting pointer to integer type for handle. */
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Terminate a session and release resources.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_CloseSession )( CK_SESSION_HANDLE xSession )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
 
+    if( NULL != pxSession )
+    {
+        /*
+         * Tear down the session.
+         */
+
+        if( NULL != pxSession->pxCurrentKey )
+        {
+            prvFreeKey( pxSession->pxCurrentKey );
+        }
+
+        mbedtls_ctr_drbg_free( &pxSession->xMbedDrbgCtx );
+        vPortFree( pxSession );
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Provides import and storage of a single client certificate and
+ * associated private key.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_CreateObject )( CK_SESSION_HANDLE xSession,
                                              CK_ATTRIBUTE_PTR pxTemplate,
                                              CK_ULONG ulCount,
                                              CK_OBJECT_HANDLE_PTR pxObject )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
 
+    /*
+     * Check parameters.
+     */
+
+    if( ( 2 > ulCount ) ||
+        ( NULL == pxSession ) ||
+        ( NULL == pxTemplate ) ||
+        ( NULL == pxObject ) )
+    {
+        xResult = CKR_ARGUMENTS_BAD;
+    }
+
+    if( CKR_OK == xResult )
+    {
+        if( ( CKA_CLASS != pxTemplate[ 0 ].type ) ||
+            ( sizeof( CK_OBJECT_CLASS ) != pxTemplate[ 0 ].ulValueLen ) )
+        {
+            xResult = CKR_ARGUMENTS_BAD;
+        }
+    }
+
+    /*
+     * Handle the object by class.
+     */
+
+    if( CKR_OK == xResult )
+    {
+        switch( *( ( uint32_t * ) pxTemplate[ 0 ].pValue ) )
+        {
+            case CKO_CERTIFICATE:
+
+                /* Validate the attribute count for this object class. */
+                if( 2 != ulCount )
+                {
+                    xResult = CKR_ARGUMENTS_BAD;
+                    break;
+                }
+
+                /* Validate the next attribute type. */
+                if( CKA_VALUE )
+                {
+                    if( CKA_VALUE != pxTemplate[ 1 ].type )
+                    {
+                        xResult = CKR_ARGUMENTS_BAD;
+                        break;
+                    }
+                }
+
+                /* Write out the client certificate. */
+                if( pdFALSE == prvSaveFile( pkcs11FILE_NAME_CLIENT_CERTIFICATE,
+                                            pxTemplate[ 1 ].pValue,
+                                            pxTemplate[ 1 ].ulValueLen ) )
+                {
+                    xResult = CKR_DEVICE_ERROR;
+                    break;
+                }
+
+                /* Attach the certificate to the session. */
+                xResult = prvInitializeKey( pxSession,
+                                            NULL,
+                                            0,
+                                            pxTemplate[ 1 ].pValue,
+                                            pxTemplate[ 1 ].ulValueLen );
+
+                /* Create a certificate handle to return. */
+                if( CKR_OK == xResult )
+                {
+                    *pxObject = pkcs11OBJECT_HANDLE_CERTIFICATE;
+                }
+
+                break;
+
+            case CKO_PRIVATE_KEY:
+
+                /* Validate the attribute count for this object class. */
+                if( 4 != ulCount )
+                {
+                    xResult = CKR_ARGUMENTS_BAD;
+                    break;
+                }
+
+                /* Find the key bytes. */
+                if( CKA_VALUE )
+                {
+                    if( CKA_VALUE != pxTemplate[ 3 ].type )
+                    {
+                        xResult = CKR_ARGUMENTS_BAD;
+                        break;
+                    }
+                }
+
+                /* Write out the key. */
+                if( pdFALSE == prvSaveFile( pkcs11FILE_NAME_KEY,
+                                            pxTemplate[ 3 ].pValue,
+                                            pxTemplate[ 3 ].ulValueLen ) )
+                {
+                    xResult = CKR_DEVICE_ERROR;
+                    break;
+                }
+
+                /* Attach the key to the session. */
+                xResult = prvInitializeKey(
+                    pxSession,
+                    pxTemplate[ 3 ].pValue,
+                    pxTemplate[ 3 ].ulValueLen,
+                    NULL,
+                    0 );
+
+                /* Create a key handle to return. */
+                if( CKR_OK == xResult )
+                {
+                    *pxObject = pkcs11OBJECT_HANDLE_PRIVATE_KEY;
+                }
+
+                break;
+
+            default:
+                xResult = CKR_ARGUMENTS_BAD;
+        }
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Free resources attached to an object handle.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_DestroyObject )( CK_SESSION_HANDLE xSession,
                                               CK_OBJECT_HANDLE xObject )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( xSession );
+    ( void ) ( xObject );
 
+    /*
+     * This implementation uses virtual handles, and the certificate and
+     * private key data are attached to the session, so nothing to do here.
+     */
+    return CKR_OK;
+}
+
+/**
+ * @brief Query the value of the specified cryptographic object attribute.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_GetAttributeValue )( CK_SESSION_HANDLE xSession,
                                                   CK_OBJECT_HANDLE xObject,
                                                   CK_ATTRIBUTE_PTR pxTemplate,
                                                   CK_ULONG ulCount )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
+    CK_VOID_PTR pvAttr = NULL;
+    CK_ULONG ulAttrLength = 0;
+    mbedtls_pk_type_t xMbedPkType;
+    CK_ULONG xP11KeyType, iAttrib, xKeyBitLen;
 
+    ( void ) ( xObject );
+
+    /*
+     * Enumerate the requested attributes.
+     */
+
+    for( iAttrib = 0; iAttrib < ulCount && CKR_OK == xResult; iAttrib++ )
+    {
+        /*
+         * Get the attribute data and size.
+         */
+
+        switch( pxTemplate[ iAttrib ].type )
+        {
+            case CKA_KEY_TYPE:
+
+                /*
+                 * Map the private key type between APIs.
+                 */
+                xMbedPkType = mbedtls_pk_get_type( &pxSession->pxCurrentKey->xMbedPkCtx );
+
+                switch( xMbedPkType )
+                {
+                    case MBEDTLS_PK_RSA:
+                    case MBEDTLS_PK_RSA_ALT:
+                    case MBEDTLS_PK_RSASSA_PSS:
+                        xP11KeyType = CKK_RSA;
+                        break;
+
+                    case MBEDTLS_PK_ECKEY:
+                    case MBEDTLS_PK_ECKEY_DH:
+                        xP11KeyType = CKK_EC;
+                        break;
+
+                    case MBEDTLS_PK_ECDSA:
+                        xP11KeyType = CKK_ECDSA;
+                        break;
+
+                    default:
+                        xResult = CKR_ATTRIBUTE_VALUE_INVALID;
+                        break;
+                }
+
+                ulAttrLength = sizeof( xP11KeyType );
+                pvAttr = &xP11KeyType;
+                break;
+
+            case CKA_VALUE:
+
+                /*
+                 * Assume that the query is for the encoded client certificate.
+                 */
+                pvAttr = ( CK_VOID_PTR ) pxSession->pxCurrentKey->xMbedX509Cli.raw.p; /*lint !e9005 !e9087 Allow casting other types to void*. */
+                ulAttrLength = pxSession->pxCurrentKey->xMbedX509Cli.raw.len;
+                break;
+
+            case CKA_MODULUS_BITS:
+            case CKA_PRIME_BITS:
+
+                /*
+                 * Key strength size query, handled the same for RSA or ECDSA
+                 * in this port.
+                 */
+                xKeyBitLen = mbedtls_pk_get_bitlen(
+                    &pxSession->pxCurrentKey->xMbedPkCtx );
+                ulAttrLength = sizeof( xKeyBitLen );
+                pvAttr = &xKeyBitLen;
+                break;
+
+            case CKA_VENDOR_DEFINED:
+
+                /*
+                 * Return the key context for application-layer use.
+                 */
+                ulAttrLength = sizeof( pxSession->pxCurrentKey->xMbedPkCtx );
+                pvAttr = &pxSession->pxCurrentKey->xMbedPkCtx;
+                break;
+
+            default:
+                xResult = CKR_ATTRIBUTE_TYPE_INVALID;
+                break;
+        }
+
+        if( CKR_OK == xResult )
+        {
+            /*
+             * Copy out the data and size.
+             */
+
+            if( NULL != pxTemplate[ iAttrib ].pValue )
+            {
+                if( pxTemplate[ iAttrib ].ulValueLen < ulAttrLength )
+                {
+                    xResult = CKR_BUFFER_TOO_SMALL;
+                }
+                else
+                {
+                    memcpy( pxTemplate[ iAttrib ].pValue, pvAttr, ulAttrLength );
+                }
+            }
+
+            pxTemplate[ iAttrib ].ulValueLen = ulAttrLength;
+        }
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Begin an enumeration sequence for the objects of the specified type.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsInit )( CK_SESSION_HANDLE xSession,
                                                 CK_ATTRIBUTE_PTR pxTemplate,
                                                 CK_ULONG ulCount )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
 
+    ( void ) ( ulCount );
+
+    /*
+     * Allow filtering on a single object class attribute.
+     */
+
+    pxSession->xFindObjectInit = CK_TRUE;
+    pxSession->xFindObjectComplete = CK_FALSE;
+    memcpy( &pxSession->xFindObjectClass,
+            pxTemplate[ 0 ].pValue,
+            sizeof( CK_OBJECT_CLASS ) );
+
+    return CKR_OK;
+}
+
+/**
+ * @brief Query the objects of the requested type.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
                                             CK_OBJECT_HANDLE_PTR pxObject,
                                             CK_ULONG ulMaxObjectCount,
                                             CK_ULONG_PTR pulObjectCount )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    BaseType_t xDone = pdFALSE;
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
 
+    /*
+     * Check parameters.
+     */
+
+    if( ( CK_BBOOL ) CK_FALSE == pxSession->xFindObjectInit )
+    {
+        xResult = CKR_OPERATION_NOT_INITIALIZED;
+        xDone = pdTRUE;
+    }
+
+    if( ( pdFALSE == xDone ) && ( 0u == ulMaxObjectCount ) )
+    {
+        xResult = CKR_ARGUMENTS_BAD;
+        xDone = pdTRUE;
+    }
+
+    if( ( pdFALSE == xDone ) && ( ( CK_BBOOL ) CK_TRUE == pxSession->xFindObjectComplete ) )
+    {
+        *pulObjectCount = 0;
+        xResult = CKR_OK;
+        xDone = pdTRUE;
+    }
+
+    /*
+     * Load the default private key and certificate.
+     */
+
+    if( ( pdFALSE == xDone ) && ( NULL == pxSession->pxCurrentKey ) )
+    {
+        if( CKR_OK != ( xResult = prvLoadAndInitializeDefaultCertificateAndKey( pxSession ) ) )
+        {
+            xDone = pdTRUE;
+        }
+    }
+
+    if( pdFALSE == xDone )
+    {
+        /*
+         * Return object handles based on find type.
+         */
+
+        switch( pxSession->xFindObjectClass )
+        {
+            case CKO_PRIVATE_KEY:
+                *pxObject = pkcs11OBJECT_HANDLE_PRIVATE_KEY;
+                *pulObjectCount = 1;
+                break;
+
+            case CKO_PUBLIC_KEY:
+                *pxObject = pkcs11OBJECT_HANDLE_PUBLIC_KEY;
+                *pulObjectCount = 1;
+                break;
+
+            case CKO_CERTIFICATE:
+                *pxObject = pkcs11OBJECT_HANDLE_CERTIFICATE;
+                *pulObjectCount = 1;
+                break;
+
+            default:
+                *pxObject = 0;
+                *pulObjectCount = 0;
+                break;
+        }
+
+        pxSession->xFindObjectComplete = CK_TRUE;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Terminate object enumeration.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_FindObjectsFinal )( CK_SESSION_HANDLE xSession )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSession = prvSessionPointerFromHandle( xSession );
 
+    /*
+     * Check parameters.
+     */
+
+    if( ( CK_BBOOL ) CK_FALSE == pxSession->xFindObjectInit )
+    {
+        xResult = CKR_OPERATION_NOT_INITIALIZED;
+    }
+    else
+    {
+        /*
+         * Clean-up find objects state.
+         */
+
+        pxSession->xFindObjectInit = CK_FALSE;
+        pxSession->xFindObjectComplete = CK_FALSE;
+        pxSession->xFindObjectClass = 0;
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Begin a digital signature generation session.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_SignInit )( CK_SESSION_HANDLE xSession,
                                          CK_MECHANISM_PTR pxMechanism,
                                          CK_OBJECT_HANDLE xKey )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( xSession );
+    ( void ) ( pxMechanism );
+    ( void ) ( xKey );
 
+    return CKR_OK;
+}
+
+/**
+ * @brief Digitally sign the indicated cryptographic hash bytes.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_Sign )( CK_SESSION_HANDLE xSession,
                                      CK_BYTE_PTR pucData,
                                      CK_ULONG ulDataLen,
                                      CK_BYTE_PTR pucSignature,
                                      CK_ULONG_PTR pulSignatureLen )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSessionObj = prvSessionPointerFromHandle( xSession );
 
+    /*
+     * Support length check.
+     */
+
+    if( NULL == pucSignature )
+    {
+        *pulSignatureLen = pkcs11SUPPORTED_KEY_BITS / 8;
+    }
+    else
+    {
+        /*
+         * Check algorithm support.
+         */
+
+        if( ( CK_ULONG ) cryptoSHA256_DIGEST_BYTES != ulDataLen )
+        {
+            xResult = CKR_DATA_LEN_RANGE;
+        }
+
+        /*
+         * Sign the data.
+         */
+
+        if( CKR_OK == xResult )
+        {
+            if( 0 != pxSessionObj->pxCurrentKey->pfnSavedMbedSign(
+                    pxSessionObj->pxCurrentKey->pvSavedMbedPkCtx,
+                    MBEDTLS_MD_SHA256,
+                    pucData,
+                    ulDataLen,
+                    pucSignature,
+                    ( size_t * ) pulSignatureLen,
+                    mbedtls_ctr_drbg_random,
+                    &pxSessionObj->xMbedDrbgCtx ) )
+            {
+                xResult = CKR_FUNCTION_FAILED;
+            }
+        }
+    }
+
+    return xResult;
+}
+
+/**
+ * @brief Begin a digital signature verification session.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_VerifyInit )( CK_SESSION_HANDLE xSession,
                                            CK_MECHANISM_PTR pxMechanism,
                                            CK_OBJECT_HANDLE xKey )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    ( void ) ( xSession );
+    ( void ) ( pxMechanism );
+    ( void ) ( xKey );
 
+    return CKR_OK;
+}
+
+/**
+ * @brief Verify the digital signature of the specified data using the public
+ * key attached to this session.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_Verify )( CK_SESSION_HANDLE xSession,
                                        CK_BYTE_PTR pucData,
                                        CK_ULONG ulDataLen,
                                        CK_BYTE_PTR pucSignature,
                                        CK_ULONG ulSignatureLen )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    CK_RV xResult = CKR_OK;
+    P11SessionPtr_t pxSessionObj = prvSessionPointerFromHandle( xSession );
 
+    /* Verify the signature. */
+    if( 0 != pxSessionObj->pxCurrentKey->xMbedPkInfo.verify_func(
+        pxSessionObj->pxCurrentKey->pvSavedMbedPkCtx,
+        MBEDTLS_MD_SHA256,
+        pucData,
+        ulDataLen,
+        pucSignature,
+        ulSignatureLen ) )
+    {
+        xResult = CKR_SIGNATURE_INVALID;
+    }
+
+    /* Return the signature verification result. */
+    return xResult;
+}
+
+/**
+ * @brief Generate cryptographically random bytes.
+ */
 CK_DEFINE_FUNCTION( CK_RV, C_GenerateRandom )( CK_SESSION_HANDLE xSession,
                                                CK_BYTE_PTR pucRandomData,
                                                CK_ULONG ulRandomLen )
-{
-    /* FIX ME. */
-    return CKR_GENERAL_ERROR;
-}
-/*-----------------------------------------------------------*/
+{   /*lint !e9072 It's OK to have different parameter name. */
+    P11SessionPtr_t pxSessionObj = prvSessionPointerFromHandle( xSession );
 
-int mbedtls_hardware_poll( void *data,
-                    unsigned char *output, size_t len, size_t *olen )
-{
-  /* FIX ME. */
-  return 0;
+    if( 0 != mbedtls_ctr_drbg_random( &pxSessionObj->xMbedDrbgCtx, pucRandomData, ulRandomLen ) )
+    {
+        return CKR_FUNCTION_FAILED;
+    }
+
+    return CKR_OK;
 }
+
+
+/* Renesas */
+// XXX
+int FLASH_update(uint32_t dst_addr, const void *data, uint32_t size)
+{
+    uint32_t    i;
+    flash_err_t err;
+    volatile uint32_t addr;
+    uint32_t    size_blk;
+	uint32_t * src_addr = (uint32_t *) data;
+
+    /* Open driver */
+    err = R_FLASH_Open();
+    if (err != FLASH_SUCCESS) return -1;
+
+    /* Erase code flash block */
+    addr = dst_addr;
+    if ((size%64) == 0)
+    {
+        size_blk = (int)(size/64);
+    }
+    else
+    {
+        size_blk = (int)(size/64) + 1;
+    }
+
+    err = R_FLASH_Erase(dst_addr, (size_blk/64));
+    if (err != FLASH_SUCCESS) return -1;
+
+    while (addr < (dst_addr + size_blk))
+    {
+        err = R_FLASH_Write((uint32_t)src_addr, addr, size_blk);
+        if(err != FLASH_SUCCESS) return -1;
+
+        /* Verify code flash write */
+        for (i = 0; i < size_blk; i++)
+        {
+            if (*((uint8_t *)(src_addr + i)) != *((uint8_t *)(addr + i)))
+            {
+                return -1;
+            }
+        }
+
+        addr += size_blk;
+    }
+
+    return size_blk;
+}
+

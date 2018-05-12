@@ -7,70 +7,6 @@
   </Placeholders>
   <Project Name="aws_demos" Type="Application">
     <Files>
-      <Category Name="common">
-        <Category Name="include">
-          <Path>..\..\..\common\include\aws_application_version.h</Path>
-          <Path>..\..\..\common\include\aws_clientcredential.h</Path>
-          <Path>..\..\..\common\include\aws_clientcredential_keys.h</Path>
-          <Path>..\..\..\common\include\aws_demo.h</Path>
-          <Path>..\..\..\common\include\aws_demo_runner.h</Path>
-          <Path>..\..\..\common\include\aws_dev_mode_key_provisioning.h</Path>
-          <Path>..\..\..\common\include\aws_greengrass_discovery_demo.h</Path>
-          <Path>..\..\..\common\include\aws_hello_world.h</Path>
-          <Path>..\..\..\common\include\aws_logging_task.h</Path>
-          <Path>..\..\..\common\include\aws_ota_update_demo.h</Path>
-          <Path>..\..\..\common\include\aws_shadow_lightbulb_on_off.h</Path>
-          <Path>..\..\..\common\include\aws_simple_tcp_echo_server.h</Path>
-          <Path>..\..\..\common\include\aws_subscribe_publish_loop.h</Path>
-          <Path>..\..\..\common\include\aws_tcp_echo_client_single_tasks.h</Path>
-        </Category>
-        <Category Name="demo_runner">
-          <Path>..\..\..\common\demo_runner\aws_demo_runner.c</Path>
-        </Category>
-        <Category Name="devmode_key_provisioning">
-          <Path>..\..\..\common\devmode_key_provisioning\aws_dev_mode_key_provisioning.c</Path>
-        </Category>
-        <Category Name="greengrass_connectivity">
-          <Path>..\..\..\common\greengrass_connectivity\aws_greengrass_discovery_demo.c</Path>
-        </Category>
-        <Category Name="mqtt">
-          <Path>..\..\..\common\mqtt\aws_hello_world.c</Path>
-          <Path>..\..\..\common\mqtt\aws_subscribe_publish_loop.c</Path>
-        </Category>
-        <Category Name="logging">
-          <Path>..\..\..\common\logging\aws_logging_task_dynamic_buffers.c</Path>
-        </Category>
-        <Category Name="ota">
-          <Path>..\..\..\common\ota\aws_ota_update_demo.c</Path>
-        </Category>
-        <Category Name="shadow">
-          <Path>..\..\..\common\shadow\aws_shadow_lightbulb_on_off.c</Path>
-        </Category>
-        <Category Name="tcp">
-          <Path>..\..\..\common\tcp\aws_tcp_echo_client_separate_tasks.c</Path>
-          <Path>..\..\..\common\tcp\aws_tcp_echo_client_single_task.c</Path>
-        </Category>
-        <Category Name="application_code">
-          <Path>..\common\application_code\helper.c</Path>
-          <Path>..\common\application_code\main.c</Path>
-          <Path>..\common\application_code\time.h</Path>
-          <Category Name="renesas_code">
-            <Path>..\common\application_code\renesas_code\placeholder.txt</Path>
-          </Category>
-        </Category>
-        <Category Name="config_files">
-          <Path>..\common\config_files\FreeRTOSConfig.h</Path>
-          <Path>..\common\config_files\FreeRTOSIPConfig.h</Path>
-          <Path>..\common\config_files\aws_bufferpool_config.h</Path>
-          <Path>..\common\config_files\aws_demo_config.h</Path>
-          <Path>..\common\config_files\aws_ggd_config.h</Path>
-          <Path>..\common\config_files\aws_mqtt_agent_config.h</Path>
-          <Path>..\common\config_files\aws_mqtt_config.h</Path>
-          <Path>..\common\config_files\aws_secure_sockets_config.h</Path>
-          <Path>..\common\config_files\aws_shadow_config.h</Path>
-          <Path>..\common\config_files\aws_wifi_config.h</Path>
-        </Category>
-      </Category>
       <Category Name="lib">
         <Category Name="FreeRTOS">
           <Path>..\..\..\..\lib\FreeRTOS\event_groups.c</Path>
@@ -137,6 +73,7 @@
                 <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\README_DRIVER_DISCLAIMER.txt</Path>
                 <Category Name="RX">
                   <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.c</Path>
+                  <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\ether_callback.c</Path>
                 </Category>
               </Category>
             </Category>
@@ -461,290 +398,408 @@
           </Category>
         </Category>
       </Category>
-      <Category Name="src">
-        <Path>src\lcd_conf.c</Path>
-        <Path>src\r_ascii.c</Path>
-        <Path>src\r_ascii.h</Path>
-        <Path>src\r_simple_graphic.c</Path>
-        <Path>src\r_simple_graphic_if.h</Path>
-        <Path>src\rx65n_rsk_aws.c</Path>
-        <Category Name="FreeRTOS_user">
-          <Path>src\FreeRTOS_user\freertos_usr_func.c</Path>
-          <Path>src\FreeRTOS_user\freertos_usr_func.h</Path>
-        </Category>
-        <Category Name="realtime_OS_pkg">
-          <Path>src\realtime_OS_pkg\get!.txt</Path>
-          <Category Name="alternative">
-            <Path>src\realtime_OS_pkg\alternative\hwsetup.c</Path>
-            <Path>src\realtime_OS_pkg\alternative\platform.h</Path>
-            <Path>src\realtime_OS_pkg\alternative\r_bsp.h</Path>
-          </Category>
-          <Category Name="r_bsp_rtos">
-            <Path>src\realtime_OS_pkg\r_bsp_rtos\platform.h</Path>
-            <Path>src\realtime_OS_pkg\r_bsp_rtos\readme.txt</Path>
-            <Category Name="board">
-              <Category Name="rskrx65n_2mb">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\dbsct.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowlvl.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_config_reference.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_interrupt_config_reference.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\resetprg.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\rskrx65n_2mb.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\sbrk.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\vecttbl.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\vecttbl.h</Path>
-              </Category>
-              <Category Name="user">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\user\r_bsp.h</Path>
-              </Category>
-            </Category>
-            <Category Name="doc">
-              <Category Name="en">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\doc\en\r01an1685ej0360-rx.pdf</Path>
-              </Category>
-              <Category Name="ja">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\doc\ja\r01an1685jj0360-rx.pdf</Path>
-              </Category>
-            </Category>
-            <Category Name="mcu">
-              <Category Name="all">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_bsp_common.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_bsp_common.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_typedefs.h</Path>
-              </Category>
-              <Category Name="rx65n">
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\cpu.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\cpu.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\locking.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\locking.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_clocks.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_info.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_init.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_init.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_interrupts.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_interrupts.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_locks.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_locks.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts_private.h</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_startup.c</Path>
-                <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_startup.h</Path>
-                <Category Name="register_access">
-                  <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access\iodefine.h</Path>
+      <Category Name="demos">
+        <Category Name="renesas">
+          <Category Name="rx65n-rsk">
+            <Category Name="ccrx-csplus">
+              <Category Name="src">
+                <Category Name="realtime_OS_pkg">
+                  <Path>src\realtime_OS_pkg\get!.txt</Path>
+                  <Category Name="alternative">
+                    <Path>src\realtime_OS_pkg\alternative\hwsetup.c</Path>
+                    <Path>src\realtime_OS_pkg\alternative\platform.h</Path>
+                    <Path>src\realtime_OS_pkg\alternative\r_bsp.h</Path>
+                  </Category>
+                  <Category Name="r_bsp_rtos">
+                    <Path>src\realtime_OS_pkg\r_bsp_rtos\platform.h</Path>
+                    <Path>src\realtime_OS_pkg\r_bsp_rtos\readme.txt</Path>
+                    <Category Name="board">
+                      <Category Name="rskrx65n_2mb">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\dbsct.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowlvl.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_config_reference.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_interrupt_config_reference.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\resetprg.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\rskrx65n_2mb.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\sbrk.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\vecttbl.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\vecttbl.h</Path>
+                      </Category>
+                      <Category Name="user">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\board\user\r_bsp.h</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\doc\en\r01an1685ej0360-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\doc\ja\r01an1685jj0360-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="mcu">
+                      <Category Name="all">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_bsp_common.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_bsp_common.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\all\r_typedefs.h</Path>
+                      </Category>
+                      <Category Name="rx65n">
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\cpu.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\cpu.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\locking.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\locking.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_clocks.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_info.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_init.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_init.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_interrupts.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_interrupts.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_locks.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_locks.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_mapped_interrupts_private.h</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_startup.c</Path>
+                        <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\mcu_startup.h</Path>
+                        <Category Name="register_access">
+                          <Path>src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access\iodefine.h</Path>
+                        </Category>
+                      </Category>
+                    </Category>
+                  </Category>
+                  <Category Name="r_cmt_rtos_rx">
+                    <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\r_cmt_rx_if.h</Path>
+                    <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\readme.txt</Path>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\doc\en\r01an1856ej0320-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\doc\ja\r01an1856jj0320-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\ref\r_cmt_rx_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\src\r_cmt_rx.c</Path>
+                    </Category>
+                  </Category>
+                </Category>
+                <Category Name="Smart Configurator">
+                  <Category Name="general">
+                    <Path>src\smc_gen\general\r_cg_hardware_setup.c</Path>
+                    <Path>src\smc_gen\general\r_cg_macrodriver.h</Path>
+                    <Path>src\smc_gen\general\r_cg_userdefine.h</Path>
+                    <Path>src\smc_gen\general\r_smc_cgc.c</Path>
+                    <Path>src\smc_gen\general\r_smc_cgc.h</Path>
+                    <Path>src\smc_gen\general\r_smc_cgc_user.c</Path>
+                    <Path>src\smc_gen\general\r_smc_entry.h</Path>
+                    <Path>src\smc_gen\general\r_smc_interrupt.c</Path>
+                    <Path>src\smc_gen\general\r_smc_interrupt.h</Path>
+                  </Category>
+                  <Category Name="r_bsp">
+                    <Path>src\smc_gen\r_bsp\platform.h</Path>
+                    <Path>src\smc_gen\r_bsp\readme.txt</Path>
+                    <Category Name="board">
+                      <Category Name="generic_rx65n">
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\dbsct.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.h</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowlvl.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowsrc.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowsrc.h</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\resetprg.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp.h</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp_config_reference.h</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp_interrupt_config_reference.h</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\sbrk.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\vecttbl.c</Path>
+                        <Path>src\smc_gen\r_bsp\board\generic_rx65n\vecttbl.h</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\smc_gen\r_bsp\doc\en\r01an1685ej0360-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\smc_gen\r_bsp\doc\ja\r01an1685jj0360-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="mcu">
+                      <Category Name="all">
+                        <Path>src\smc_gen\r_bsp\mcu\all\r_bsp_common.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\all\r_bsp_common.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\all\r_typedefs.h</Path>
+                      </Category>
+                      <Category Name="rx65n">
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\cpu.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\cpu.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\locking.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\locking.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_clocks.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_info.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_init.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_init.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_interrupts.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_interrupts.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_locks.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_locks.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts_private.h</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_startup.c</Path>
+                        <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_startup.h</Path>
+                        <Category Name="register_access">
+                          <Path>src\smc_gen\r_bsp\mcu\rx65n\register_access\iodefine.h</Path>
+                        </Category>
+                      </Category>
+                    </Category>
+                  </Category>
+                  <Category Name="r_cmt_rx">
+                    <Path>src\smc_gen\r_cmt_rx\readme.txt</Path>
+                    <Path>src\smc_gen\r_cmt_rx\r_cmt_rx_if.h</Path>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0320-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0320-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\smc_gen\r_cmt_rx\ref\r_cmt_rx_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\smc_gen\r_cmt_rx\src\r_cmt_rx.c</Path>
+                    </Category>
+                  </Category>
+                  <Category Name="r_config">
+                    <Path>src\smc_gen\r_config\r_bsp_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_bsp_config_readme.txt</Path>
+                    <Path>src\smc_gen\r_config\r_bsp_interrupt_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_cmt_rx_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_ether_rx_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_flash_rx_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_byteq_config.h</Path>
+                    <Path>src\smc_gen\r_config\r_sci_rx_config.h</Path>
+                  </Category>
+                  <Category Name="r_ether_rx">
+                    <Path>src\smc_gen\r_ether_rx\readme.txt</Path>
+                    <Path>src\smc_gen\r_ether_rx\r_ether_rx_if.h</Path>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0113-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0113-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\smc_gen\r_ether_rx\ref\r_ether_rx_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\smc_gen\r_ether_rx\src\r_ether_rx.c</Path>
+                      <Path>src\smc_gen\r_ether_rx\src\r_ether_rx_private.h</Path>
+                      <Category Name="phy">
+                        <Path>src\smc_gen\r_ether_rx\src\phy\phy.c</Path>
+                        <Path>src\smc_gen\r_ether_rx\src\phy\phy.h</Path>
+                      </Category>
+                      <Category Name="targets">
+                        <Category Name="rx65n">
+                          <Path>src\smc_gen\r_ether_rx\src\targets\rx65n\r_ether_setting_rx65n.c</Path>
+                        </Category>
+                      </Category>
+                    </Category>
+                  </Category>
+                  <Category Name="r_flash_rx">
+                    <Path>src\smc_gen\r_flash_rx\readme.txt</Path>
+                    <Path>src\smc_gen\r_flash_rx\r_flash_rx_if.h</Path>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0320-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0320-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\smc_gen\r_flash_rx\ref\r_flash_rx_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.c</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.h</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_group.c</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_group.h</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.c</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.h</Path>
+                      <Path>src\smc_gen\r_flash_rx\src\r_flash_targets.h</Path>
+                      <Category Name="flash_type_1">
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.h</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.h</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.h</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_common.h</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1_if.h</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_utils.c</Path>
+                      </Category>
+                      <Category Name="flash_type_2">
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2_if.h</Path>
+                      </Category>
+                      <Category Name="flash_type_3">
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3_if.h</Path>
+                      </Category>
+                      <Category Name="flash_type_4">
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4.c</Path>
+                        <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4_if.h</Path>
+                      </Category>
+                      <Category Name="targets">
+                        <Category Name="rx65n">
+                          <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_flash_rx65n.h</Path>
+                          <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_mcu_config_reference.h</Path>
+                        </Category>
+                      </Category>
+                    </Category>
+                  </Category>
+                  <Category Name="r_pincfg">
+                    <Path>src\smc_gen\r_pincfg\Pin.c</Path>
+                    <Path>src\smc_gen\r_pincfg\Pin.h</Path>
+                    <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.c</Path>
+                    <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.h</Path>
+                    <Path>src\smc_gen\r_pincfg\r_pinset.h</Path>
+                    <Path>src\smc_gen\r_pincfg\r_sci_rx_pinset.c</Path>
+                    <Path>src\smc_gen\r_pincfg\r_sci_rx_pinset.h</Path>
+                  </Category>
+                  <Category Name="r_byteq">
+                    <Path>src\smc_gen\r_byteq\readme.txt</Path>
+                    <Path>src\smc_gen\r_byteq\r_byteq_if.h</Path>
+                    <Category Name="doc">
+                      <Path>src\smc_gen\r_byteq\doc\r01an1683jj0160_rx.pdf</Path>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\smc_gen\r_byteq\ref\r_byteq_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\smc_gen\r_byteq\src\r_byteq.c</Path>
+                      <Path>src\smc_gen\r_byteq\src\r_byteq_private.h</Path>
+                    </Category>
+                  </Category>
+                  <Category Name="r_sci_rx">
+                    <Path>src\smc_gen\r_sci_rx\readme.txt</Path>
+                    <Path>src\smc_gen\r_sci_rx\r_sci_rx_if.h</Path>
+                    <Category Name="doc">
+                      <Category Name="en">
+                        <Path>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0200-rx.pdf</Path>
+                      </Category>
+                      <Category Name="ja">
+                        <Path>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0200-rx.pdf</Path>
+                      </Category>
+                    </Category>
+                    <Category Name="ref">
+                      <Path>src\smc_gen\r_sci_rx\ref\r_sci_rx_config_reference.h</Path>
+                    </Category>
+                    <Category Name="src">
+                      <Path>src\smc_gen\r_sci_rx\src\r_sci_rx.c</Path>
+                      <Path>src\smc_gen\r_sci_rx\src\r_sci_rx_platform.h</Path>
+                      <Path>src\smc_gen\r_sci_rx\src\r_sci_rx_private.h</Path>
+                      <Category Name="targets">
+                        <Category Name="rx65n">
+                          <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n.c</Path>
+                          <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n_data.c</Path>
+                          <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n_private.h</Path>
+                        </Category>
+                      </Category>
+                    </Category>
+                  </Category>
                 </Category>
               </Category>
             </Category>
-          </Category>
-          <Category Name="r_cmt_rtos_rx">
-            <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\r_cmt_rx_if.h</Path>
-            <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\readme.txt</Path>
-            <Category Name="doc">
-              <Category Name="en">
-                <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\doc\en\r01an1856ej0320-rx.pdf</Path>
+            <Category Name="common">
+              <Category Name="application_code">
+                <Path>..\common\application_code\entropy_hardware_poll.c</Path>
+                <Category Name="renesas_code" />
+                <Path>..\common\application_code\rskrx65n_uart.c</Path>
+                <Path>..\common\application_code\rskrx65n_uart.h</Path>
+                <Path>..\common\application_code\freertos_usr_func.c</Path>
+                <Path>..\common\application_code\freertos_usr_func.h</Path>
               </Category>
-              <Category Name="ja">
-                <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\doc\ja\r01an1856jj0320-rx.pdf</Path>
-              </Category>
-            </Category>
-            <Category Name="ref">
-              <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\ref\r_cmt_rx_config_reference.h</Path>
-            </Category>
-            <Category Name="src">
-              <Path>src\realtime_OS_pkg\r_cmt_rtos_rx\src\r_cmt_rx.c</Path>
+              <Category Name="config_files" />
             </Category>
           </Category>
         </Category>
-      </Category>
-      <Category Name="Smart Configurator">
-        <Category Name="general">
-          <Path>src\smc_gen\general\r_cg_hardware_setup.c</Path>
-          <Path>src\smc_gen\general\r_cg_macrodriver.h</Path>
-          <Path>src\smc_gen\general\r_cg_userdefine.h</Path>
-          <Path>src\smc_gen\general\r_smc_cgc.c</Path>
-          <Path>src\smc_gen\general\r_smc_cgc.h</Path>
-          <Path>src\smc_gen\general\r_smc_cgc_user.c</Path>
-          <Path>src\smc_gen\general\r_smc_entry.h</Path>
-          <Path>src\smc_gen\general\r_smc_interrupt.c</Path>
-          <Path>src\smc_gen\general\r_smc_interrupt.h</Path>
-        </Category>
-        <Category Name="r_bsp">
-          <Path>src\smc_gen\r_bsp\platform.h</Path>
-          <Path>src\smc_gen\r_bsp\readme.txt</Path>
-          <Category Name="board">
-            <Category Name="generic_rx65n">
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\dbsct.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.h</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowlvl.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowsrc.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\lowsrc.h</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\resetprg.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp.h</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp_config_reference.h</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\r_bsp_interrupt_config_reference.h</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\sbrk.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\vecttbl.c</Path>
-              <Path>src\smc_gen\r_bsp\board\generic_rx65n\vecttbl.h</Path>
+        <Category Name="common">
+          <Category Name="include">
+            <Path>..\..\..\common\include\aws_application_version.h</Path>
+            <Path>..\..\..\common\include\aws_clientcredential.h</Path>
+            <Path>..\..\..\common\include\aws_clientcredential_keys.h</Path>
+            <Path>..\..\..\common\include\aws_demo.h</Path>
+            <Path>..\..\..\common\include\aws_demo_runner.h</Path>
+            <Path>..\..\..\common\include\aws_dev_mode_key_provisioning.h</Path>
+            <Path>..\..\..\common\include\aws_greengrass_discovery_demo.h</Path>
+            <Path>..\..\..\common\include\aws_hello_world.h</Path>
+            <Path>..\..\..\common\include\aws_logging_task.h</Path>
+            <Path>..\..\..\common\include\aws_ota_update_demo.h</Path>
+            <Path>..\..\..\common\include\aws_shadow_lightbulb_on_off.h</Path>
+            <Path>..\..\..\common\include\aws_simple_tcp_echo_server.h</Path>
+            <Path>..\..\..\common\include\aws_subscribe_publish_loop.h</Path>
+            <Path>..\..\..\common\include\aws_tcp_echo_client_single_tasks.h</Path>
+          </Category>
+          <Category Name="demo_runner">
+            <Path>..\..\..\common\demo_runner\aws_demo_runner.c</Path>
+          </Category>
+          <Category Name="devmode_key_provisioning">
+            <Path>..\..\..\common\devmode_key_provisioning\aws_dev_mode_key_provisioning.c</Path>
+          </Category>
+          <Category Name="greengrass_connectivity">
+            <Path>..\..\..\common\greengrass_connectivity\aws_greengrass_discovery_demo.c</Path>
+          </Category>
+          <Category Name="mqtt">
+            <Path>..\..\..\common\mqtt\aws_hello_world.c</Path>
+            <Path>..\..\..\common\mqtt\aws_subscribe_publish_loop.c</Path>
+          </Category>
+          <Category Name="logging">
+            <Path>..\..\..\common\logging\aws_logging_task_dynamic_buffers.c</Path>
+          </Category>
+          <Category Name="ota">
+            <Path>..\..\..\common\ota\aws_ota_update_demo.c</Path>
+          </Category>
+          <Category Name="shadow">
+            <Path>..\..\..\common\shadow\aws_shadow_lightbulb_on_off.c</Path>
+          </Category>
+          <Category Name="tcp">
+            <Path>..\..\..\common\tcp\aws_tcp_echo_client_separate_tasks.c</Path>
+            <Path>..\..\..\common\tcp\aws_tcp_echo_client_single_task.c</Path>
+          </Category>
+          <Category Name="application_code">
+            <Path>..\common\application_code\helper.c</Path>
+            <Path>..\common\application_code\main.c</Path>
+            <Path>..\common\application_code\time.h</Path>
+            <Category Name="renesas_code">
+              <Path>..\common\application_code\renesas_code\placeholder.txt</Path>
             </Category>
           </Category>
-          <Category Name="doc">
-            <Category Name="en">
-              <Path>src\smc_gen\r_bsp\doc\en\r01an1685ej0360-rx.pdf</Path>
-            </Category>
-            <Category Name="ja">
-              <Path>src\smc_gen\r_bsp\doc\ja\r01an1685jj0360-rx.pdf</Path>
-            </Category>
+          <Category Name="config_files">
+            <Path>..\common\config_files\FreeRTOSConfig.h</Path>
+            <Path>..\common\config_files\FreeRTOSIPConfig.h</Path>
+            <Path>..\common\config_files\aws_bufferpool_config.h</Path>
+            <Path>..\common\config_files\aws_demo_config.h</Path>
+            <Path>..\common\config_files\aws_ggd_config.h</Path>
+            <Path>..\common\config_files\aws_mqtt_agent_config.h</Path>
+            <Path>..\common\config_files\aws_mqtt_config.h</Path>
+            <Path>..\common\config_files\aws_secure_sockets_config.h</Path>
+            <Path>..\common\config_files\aws_shadow_config.h</Path>
+            <Path>..\common\config_files\aws_wifi_config.h</Path>
           </Category>
-          <Category Name="mcu">
-            <Category Name="all">
-              <Path>src\smc_gen\r_bsp\mcu\all\r_bsp_common.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\all\r_bsp_common.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\all\r_typedefs.h</Path>
-            </Category>
-            <Category Name="rx65n">
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\cpu.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\cpu.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\locking.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\locking.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_clocks.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_info.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_init.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_init.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_interrupts.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_interrupts.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_locks.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_locks.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_mapped_interrupts_private.h</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_startup.c</Path>
-              <Path>src\smc_gen\r_bsp\mcu\rx65n\mcu_startup.h</Path>
-              <Category Name="register_access">
-                <Path>src\smc_gen\r_bsp\mcu\rx65n\register_access\iodefine.h</Path>
-              </Category>
-            </Category>
-          </Category>
-        </Category>
-        <Category Name="r_cmt_rx">
-          <Path>src\smc_gen\r_cmt_rx\readme.txt</Path>
-          <Path>src\smc_gen\r_cmt_rx\r_cmt_rx_if.h</Path>
-          <Category Name="doc">
-            <Category Name="en">
-              <Path>src\smc_gen\r_cmt_rx\doc\en\r01an1856ej0320-rx.pdf</Path>
-            </Category>
-            <Category Name="ja">
-              <Path>src\smc_gen\r_cmt_rx\doc\ja\r01an1856jj0320-rx.pdf</Path>
-            </Category>
-          </Category>
-          <Category Name="ref">
-            <Path>src\smc_gen\r_cmt_rx\ref\r_cmt_rx_config_reference.h</Path>
-          </Category>
-          <Category Name="src">
-            <Path>src\smc_gen\r_cmt_rx\src\r_cmt_rx.c</Path>
-          </Category>
-        </Category>
-        <Category Name="r_config">
-          <Path>src\smc_gen\r_config\r_bsp_config.h</Path>
-          <Path>src\smc_gen\r_config\r_bsp_config_readme.txt</Path>
-          <Path>src\smc_gen\r_config\r_bsp_interrupt_config.h</Path>
-          <Path>src\smc_gen\r_config\r_cmt_rx_config.h</Path>
-          <Path>src\smc_gen\r_config\r_ether_rx_config.h</Path>
-          <Path>src\smc_gen\r_config\r_flash_rx_config.h</Path>
-        </Category>
-        <Category Name="r_ether_rx">
-          <Path>src\smc_gen\r_ether_rx\readme.txt</Path>
-          <Path>src\smc_gen\r_ether_rx\r_ether_rx_if.h</Path>
-          <Category Name="doc">
-            <Category Name="en">
-              <Path>src\smc_gen\r_ether_rx\doc\en\r01an2009ej0113-rx.pdf</Path>
-            </Category>
-            <Category Name="ja">
-              <Path>src\smc_gen\r_ether_rx\doc\ja\r01an2009jj0113-rx.pdf</Path>
-            </Category>
-          </Category>
-          <Category Name="ref">
-            <Path>src\smc_gen\r_ether_rx\ref\r_ether_rx_config_reference.h</Path>
-          </Category>
-          <Category Name="src">
-            <Path>src\smc_gen\r_ether_rx\src\r_ether_rx.c</Path>
-            <Path>src\smc_gen\r_ether_rx\src\r_ether_rx_private.h</Path>
-            <Category Name="phy">
-              <Path>src\smc_gen\r_ether_rx\src\phy\phy.c</Path>
-              <Path>src\smc_gen\r_ether_rx\src\phy\phy.h</Path>
-            </Category>
-            <Category Name="targets">
-              <Category Name="rx65n">
-                <Path>src\smc_gen\r_ether_rx\src\targets\rx65n\r_ether_setting_rx65n.c</Path>
-              </Category>
-            </Category>
-          </Category>
-        </Category>
-        <Category Name="r_flash_rx">
-          <Path>src\smc_gen\r_flash_rx\readme.txt</Path>
-          <Path>src\smc_gen\r_flash_rx\r_flash_rx_if.h</Path>
-          <Category Name="doc">
-            <Category Name="en">
-              <Path>src\smc_gen\r_flash_rx\doc\en\r01an2184eu0320-rx.pdf</Path>
-            </Category>
-            <Category Name="ja">
-              <Path>src\smc_gen\r_flash_rx\doc\ja\r01an2184ju0320-rx.pdf</Path>
-            </Category>
-          </Category>
-          <Category Name="ref">
-            <Path>src\smc_gen\r_flash_rx\ref\r_flash_rx_config_reference.h</Path>
-          </Category>
-          <Category Name="src">
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.c</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_fcu.h</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_group.c</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_group.h</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.c</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_rx.h</Path>
-            <Path>src\smc_gen\r_flash_rx\src\r_flash_targets.h</Path>
-            <Category Name="flash_type_1">
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash.h</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_codeflash_extra.h</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_dataflash.h</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_common.h</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_type1_if.h</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_1\r_flash_utils.c</Path>
-            </Category>
-            <Category Name="flash_type_2">
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_2\r_flash_type2_if.h</Path>
-            </Category>
-            <Category Name="flash_type_3">
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_3\r_flash_type3_if.h</Path>
-            </Category>
-            <Category Name="flash_type_4">
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4.c</Path>
-              <Path>src\smc_gen\r_flash_rx\src\flash_type_4\r_flash_type4_if.h</Path>
-            </Category>
-            <Category Name="targets">
-              <Category Name="rx65n">
-                <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_flash_rx65n.h</Path>
-                <Path>src\smc_gen\r_flash_rx\src\targets\rx65n\r_mcu_config_reference.h</Path>
-              </Category>
-            </Category>
-          </Category>
-        </Category>
-        <Category Name="r_pincfg">
-          <Path>src\smc_gen\r_pincfg\Pin.c</Path>
-          <Path>src\smc_gen\r_pincfg\Pin.h</Path>
-          <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.c</Path>
-          <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.h</Path>
-          <Path>src\smc_gen\r_pincfg\r_pinset.h</Path>
         </Category>
       </Category>
     </Files>
@@ -758,6 +813,14 @@
           <Option>-isa=rxv2</Option>
           <Option>-fpu</Option>
           <Option>-lang=c</Option>
+          <Option>-include=..\common\application_code</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\src\targets\rx65n</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\src</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\ref</Option>
+          <Option>-include=src\smc_gen\r_sci_rx</Option>
+          <Option>-include=src\smc_gen\r_byteq\src</Option>
+          <Option>-include=src\smc_gen\r_byteq\ref</Option>
+          <Option>-include=src\smc_gen\r_byteq</Option>
           <Option>-include=src\smc_gen\r_pincfg</Option>
           <Option>-include=src\smc_gen\r_flash_rx\src\targets\rx65n</Option>
           <Option>-include=src\smc_gen\r_flash_rx\src\flash_type_4</Option>
@@ -871,11 +934,6 @@
           <Path>DefaultBuild\aws_system_init.obj</Path>
           <Path>DefaultBuild\aws_wifi.obj</Path>
           <Path>DefaultBuild\jsmn.obj</Path>
-          <Path>DefaultBuild\lcd_conf.obj</Path>
-          <Path>DefaultBuild\r_ascii.obj</Path>
-          <Path>DefaultBuild\r_simple_graphic.obj</Path>
-          <Path>DefaultBuild\rx65n_rsk_aws.obj</Path>
-          <Path>DefaultBuild\freertos_usr_func.obj</Path>
           <Path>DefaultBuild\dbsct.obj</Path>
           <Path>DefaultBuild\hwsetup.obj</Path>
           <Path>DefaultBuild\lowlvl.obj</Path>
@@ -1006,8 +1064,26 @@
           <Path>DefaultBuild\r_flash_type4.obj</Path>
           <Path>DefaultBuild\Pin.obj</Path>
           <Path>DefaultBuild\r_ether_rx_pinset.obj</Path>
+          <Path>DefaultBuild\hwsetup.obj</Path>
+          <Path>DefaultBuild\r_byteq.obj</Path>
+          <Path>DefaultBuild\r_sci_rx_pinset.obj</Path>
+          <Path>DefaultBuild\r_sci_rx.obj</Path>
+          <Path>DefaultBuild\r_sci_rx65n.obj</Path>
+          <Path>DefaultBuild\r_sci_rx65n_data.obj</Path>
+          <Path>DefaultBuild\entropy_hardware_poll.obj</Path>
+          <Path>DefaultBuild\rskrx65n_uart.obj</Path>
+          <Path>DefaultBuild\freertos_usr_func.obj</Path>
+          <Path>DefaultBuild\ether_callback.obj</Path>
         </LinkOrder>
         <CommonOptions>
+          <IncludePathForC>..\common\application_code</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx\src\targets\rx65n</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx\src</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx\ref</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq\src</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq\ref</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_pincfg</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_flash_rx\src\targets\rx65n</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_flash_rx\src\flash_type_4</IncludePathForC>
@@ -1038,13 +1114,20 @@
       <BuildMode Name="HardwareDebug" Active="True">
         <GeneralOptions>
           <CommandsBefore>@src\realtime_OS_pkg\alternative\.pre-build.bat</CommandsBefore>
-          <SimultaneouslyBuild>true</SimultaneouslyBuild>
+          <SimultaneouslyBuild>false</SimultaneouslyBuild>
         </GeneralOptions>
         <CompileOptions>
           <Option>-isa=rxv2</Option>
           <Option>-fpu</Option>
           <Option>-branch=32</Option>
           <Option>-lang=c99</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\src\targets\rx65n</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\src</Option>
+          <Option>-include=src\smc_gen\r_sci_rx\ref</Option>
+          <Option>-include=src\smc_gen\r_sci_rx</Option>
+          <Option>-include=src\smc_gen\r_byteq\src</Option>
+          <Option>-include=src\smc_gen\r_byteq\ref</Option>
+          <Option>-include=src\smc_gen\r_byteq</Option>
           <Option>-include=src\smc_gen\r_pincfg</Option>
           <Option>-include=src\smc_gen\r_flash_rx\src\targets\rx65n</Option>
           <Option>-include=src\smc_gen\r_flash_rx\src\flash_type_4</Option>
@@ -1091,7 +1174,7 @@
           <Option>-include=src\FreeRTOS_user</Option>
           <Option>-include=src</Option>
           <Option>-change_message=information=21644</Option>
-          <Option>-output=obj</Option>
+          <Option>-output=obj=%ConfigDir%\%FileLeaf%.obj</Option>
           <Option>-debug</Option>
           <Option>-nologo</Option>
         </CompileOptions>
@@ -1099,6 +1182,7 @@
           <Option>-isa=rxv2</Option>
           <Option>-fpu</Option>
           <Option>-output=%ConfigDir%\%FileLeaf%.obj</Option>
+          <Option>-debug</Option>
           <Option>-nologo</Option>
         </AssembleOptions>
         <LinkOptions>
@@ -1106,7 +1190,7 @@
           <Option>-vect=_undefined_interrupt_source_isr</Option>
           <Option>-list=%ProjectName%.map</Option>
           <Option>-nooptimize</Option>
-          <Option>-start=B_1,B_2,B/0,B_FRAME2_1/0800000,B_ETHERNET_BUFFERS_1,B_RX_DESC_1,B_TX_DESC_1,SU,SI,R_1,R_2,R/0840000,C_1,C_2,C,C$*,D*,W*,L,P*/0FFF00000,EXCEPTVECT/0FFFFFF80,RESETVECT/0FFFFFFFC</Option>
+          <Option>-start=B_1,R_1,B_2,R_2,B,R/00800000,B_ETHERNET_BUFFERS_1,B_TX_DESC_1,B_RX_DESC_1,SU,SI/00840000,C_1,C_2,C,C$*,D*,W*,L,P*/FFE00000,EXCEPTVECT/FFFFFF80,RESETVECT/FFFFFFFC</Option>
           <Option>-rom=D=R,D_1=R_1,D_2=R_2</Option>
           <Option>-nologo</Option>
           <Option>-end</Option>
@@ -1132,7 +1216,6 @@
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\HTTP\FreeRTOS_HTTP_server.c" />
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\NTP\NTPDemo.c" />
         <NoTargetFile Target="..\..\..\..\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c" />
-        <NoTargetFile Target="src\rx65n_rsk_aws.c" />
         <NoTargetFile Target="src\realtime_OS_pkg\alternative\hwsetup.c" />
         <NoTargetFile Target="src\smc_gen\r_bsp\board\generic_rx65n\dbsct.c" />
         <NoTargetFile Target="src\smc_gen\r_bsp\board\generic_rx65n\hwsetup.c" />
@@ -1279,10 +1362,6 @@
           <Path>HardwareDebug\cborparser.obj</Path>
           <Path>HardwareDebug\cborparser_dup_string.obj</Path>
           <Path>HardwareDebug\cborpretty.obj</Path>
-          <Path>HardwareDebug\freertos_usr_func.obj</Path>
-          <Path>HardwareDebug\lcd_conf.obj</Path>
-          <Path>HardwareDebug\r_ascii.obj</Path>
-          <Path>HardwareDebug\r_simple_graphic.obj</Path>
           <Path>HardwareDebug\dbsct.obj</Path>
           <Path>HardwareDebug\hwsetup.obj</Path>
           <Path>HardwareDebug\lowlvl.obj</Path>
@@ -1320,8 +1399,24 @@
           <Path>HardwareDebug\r_flash_rx.obj</Path>
           <Path>HardwareDebug\Pin.obj</Path>
           <Path>HardwareDebug\r_ether_rx_pinset.obj</Path>
+          <Path>HardwareDebug\r_byteq.obj</Path>
+          <Path>HardwareDebug\r_sci_rx_pinset.obj</Path>
+          <Path>HardwareDebug\r_sci_rx.obj</Path>
+          <Path>HardwareDebug\r_sci_rx65n.obj</Path>
+          <Path>HardwareDebug\r_sci_rx65n_data.obj</Path>
+          <Path>HardwareDebug\entropy_hardware_poll.obj</Path>
+          <Path>HardwareDebug\rskrx65n_uart.obj</Path>
+          <Path>HardwareDebug\freertos_usr_func.obj</Path>
+          <Path>HardwareDebug\ether_callback.obj</Path>
         </LinkOrder>
         <CommonOptions>
+          <IncludePathForC>src\smc_gen\r_sci_rx\src\targets\rx65n</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx\src</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx\ref</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_sci_rx</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq\src</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq\ref</IncludePathForC>
+          <IncludePathForC>src\smc_gen\r_byteq</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_pincfg</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_flash_rx\src\targets\rx65n</IncludePathForC>
           <IncludePathForC>src\smc_gen\r_flash_rx\src\flash_type_4</IncludePathForC>
@@ -1374,7 +1469,7 @@
       <CodeGeneratorData></CodeGeneratorData>
       <GenerateFileFolder>C:\Renesas\AmazonFreeRTOS\amazon-freertos-1.2.2\demos\renesas\rx65n-rsk\ccrx-csplus</GenerateFileFolder>
       <SCFGFile>aws_demos.scfg</SCFGFile>
-      <SmcExePath>C:\Renesas\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
+      <SmcExePath>C:\Renesas\Renesas Electronics\SmartConfigurator\RX\eclipse\SmartConfigurator.exe</SmcExePath>
       <CodeGeneratorFilesGuid>910132c6-f23c-4603-9339-25ce2e97d0f1</CodeGeneratorFilesGuid>
     </Extension_SmcCodePart>
   </Project>

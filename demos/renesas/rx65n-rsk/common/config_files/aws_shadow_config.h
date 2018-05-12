@@ -45,63 +45,10 @@
 #define shadowConfigJSON_CLIENT_TOKEN    "clientToken"
 
 
- /**
+/**
  * @brief
  * enable/disable shadowConfigUNIQUE_CLIENT_TOKEN_CHECK check.
  */
 #define shadowConfigUNIQUE_CLIENT_TOKEN_CHECK    0
 
-
- /**
- * @brief Maximum number of Shadow Clients.
- *
- * Up to this number of Shadow Clients may be successfully created with
- * #SHADOW_ClientCreate. Shadow clients are allocated in the global data
- * segment. Ensure that there is enough memory to accommodate the Shadow
- * Clients.
- *
- * @note Should be less than 256.
- */
-#define shadowMAX_CLIENTS                         ( ( BaseType_t ) ( 1 ) )
-
- /**
- * @brief Shadow debug message setting.
- *
- * Set this value to @c 0 to disable Shadow Client debug messages; or set it to
- * @c 1 to enable debug messages. Ensure that the macro @c configPRINTF is
- * available if debugging is enabled.
- */
-#define shadowENABLE_DEBUG_LOGS                   ( 1 )
-
- /**
- * @brief Number of unique Things for which user notify callbacks can be
- * registered.
- *
- * Each Shadow Client stores the Things with user notify callbacks registered.
- * Define how many unique Things require user notify callbacks here.
- *
- * @note Should be less than 256.
- */
-#define shadowCLIENT_MAX_THINGS_WITH_CALLBACKS    ( ( BaseType_t ) ( 1 ) )
-
- /**
- * @brief Time (in milliseconds) a Shadow Client may block during cleanup @b IF
- * a timeout occurs.
- *
- * Should a Shadow API call time out, the Shadow Client will stop its current
- * operation and cleanup before returning. The time below (in milliseconds) is
- * the amount of additional time that the Shadow Client may block to cleanup @b
- * IF the user's given timeout is inadequate. In general, 5000 ms is sufficient
- * for cleanup on a good connection; more time should be given if the connection
- * is unreliable.
- *
- * @note If a user gives a Shadow API call @a x milliseconds of block time but
- * @a x is insufficient time to complete the API call, then function may block
- * for up to (@a x + #shadowCLEANUP_TIME_MS) milliseconds. However, if @a x is
- * sufficient time for the API call, then block time will be at most @a x
- * milliseconds.
- * @warning If cleanup doesn't fully complete, users may be billed for MQTT
- * messages on topics that weren't properly cleaned up!
- */
-#define shadowCLEANUP_TIME_MS                     5000
 #endif /* _AWS_SHADOW_CONFIG_H_ */

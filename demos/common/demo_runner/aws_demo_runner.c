@@ -57,7 +57,7 @@ void DEMO_RUNNER_RunDemos( void )
     /* vStartSimpleTCPServerTasks(); */
     /* vStartTCPEchoClientTasks_SingleTasks(); */
     /* vStartTCPEchoClientTasks_SeparateTasks(); */
-    /* vStartShadowDemoTasks(); */
+    /* vStartShadowDemoTasks();
     /* vStartGreenGrassDiscoveryTask(); */
     /* vStartOTAUpdateDemoTask(); */
 }

@@ -26,11 +26,7 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
 
-#include <stdio.h>
-#include "r_ether_rx_config.h"
-
-/* Prevent Renesas headers redefining some stdint.h types. */
-#define __TYPEDEF__	1
+#include "rskrx65n_uart.h"
 
 /*-----------------------------------------------------------
 * Application specific definitions.
@@ -46,31 +42,14 @@
 * stack in this demo.  Constants specific to FreeRTOS+TCP itself (rather than
 * the demo) are contained in FreeRTOSIPConfig.h.
 *----------------------------------------------------------*/
-
-/* FIX ME: Uncomment and set to the specifications for your MCU. */
-#define configCPU_CLOCK_HZ				( 120000000UL ) /*_RB_ guess*/
-#define configPERIPHERAL_CLOCK_HZ		( 60000000UL ) /*_RB_ guess*/
-
-#define configSUPPORT_STATIC_ALLOCATION            1
-/* 
- * Setting configSUPPORT_STATIC_ALLOCATION = 0 causes following link errors.
- * E0562310:Undefined external symbol "_xSemaphoreCreateBinaryStatic" referenced in ".\lib\aws\shadow\aws_shadow.obj"
- * E0562310:Undefined external symbol "_xTaskCreateStatic" referenced in ".\lib\aws\mqtt\aws_mqtt_agent.obj"
- * E0562310:Undefined external symbol "_xSemaphoreCreateMutexStatic" referenced in ".\lib\aws\shadow\aws_shadow.obj"
- * E0562310:Undefined external symbol "_xQueueCreateStatic" referenced in ".\application_code\common_demos\source\aws_shadow_lightbulb_on_off.obj"
- * E0562310:Undefined external symbol "_xQueueCreateStatic" referenced in ".\lib\aws\mqtt\aws_mqtt_agent.obj"
- * E0562310:Undefined external symbol "_xQueueCreateStatic" referenced in ".\lib\aws\ota\aws_ota_agent.obj"
- */
-
-#define configUSE_DAEMON_TASK_STARTUP_HOOK         0
 #define configENABLE_BACKWARD_COMPATIBILITY        0
 #define configUSE_PREEMPTION                       1
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION    0
 #define configMAX_PRIORITIES                       ( 7 )
 #define configTICK_RATE_HZ                         ( 1000 )
 #define configMINIMAL_STACK_SIZE                   ( ( unsigned short ) 140 )
-#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 200 * 1024U ) )
-#define configMAX_TASK_NAME_LEN                    ( 15 )
+#define configTOTAL_HEAP_SIZE                      ( ( size_t ) ( 128U * 1024U ) )
+#define configMAX_TASK_NAME_LEN                    ( 12 )
 #define configUSE_TRACE_FACILITY                   1
 #define configUSE_16_BIT_TICKS                     0
 #define configIDLE_SHOULD_YIELD                    1
@@ -84,9 +63,15 @@
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS    3      /* FreeRTOS+FAT requires 2 pointers if a CWD is supported. */
 #define configRECORD_STACK_HIGH_ADDRESS            1
 
+#define configUSE_DAEMON_TASK_STARTUP_HOOK 1
+
+#define configCPU_CLOCK_HZ				( 120000000UL )
+#define configPERIPHERAL_CLOCK_HZ		( 60000000UL )
+#define configUSE_QUEUE_SETS			1
+
 /* Hook function related definitions. */
 #define configUSE_TICK_HOOK                        0
-#define configUSE_IDLE_HOOK                        1
+#define configUSE_IDLE_HOOK                        0
 #define configUSE_MALLOC_FAILED_HOOK               1
 #define configCHECK_FOR_STACK_OVERFLOW             0      /* Not applicable to the Win32 port. */
 
@@ -94,11 +79,7 @@
 #define configUSE_TIMERS                           1
 #define configTIMER_TASK_PRIORITY                  ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH                   5
-#define configTIMER_TASK_STACK_DEPTH               ( configMINIMAL_STACK_SIZE * 2 )
-
-/* Event group related definitions. */
-#define configUSE_EVENT_GROUPS                     1
-
+#define configTIMER_TASK_STACK_DEPTH               ( configMINIMAL_STACK_SIZE)
 
 /* The interrupt priority used by the kernel itself for the tick interrupt and
 the pended interrupt.  This would normally be the lowest priority. */
@@ -107,63 +88,121 @@ the pended interrupt.  This would normally be the lowest priority. */
 /* The maximum interrupt priority from which FreeRTOS API calls can be made.
 Interrupts that use a priority above this will not be effected by anything the
 kernel is doing. */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY    7
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY    4
 
 /* The peripheral used to generate the tick interrupt is configured as part of
 the application code.  This constant should be set to the vector number of the
 peripheral chosen.  As supplied this is CMT0. */
-#define configTICK_VECTOR						_CMT0_CMI0
+#define configTICK_VECTOR						_CMT0_CMI0		//CMT0
+//#define configTICK_VECTOR						_CMT1_CMI1		//CMT1
+//#define configTICK_VECTOR						_CMT2_CMI2		//CMT2
+//#define configTICK_VECTOR						_CMT3_CMI3		//CMT3
 
-/* Set the timer channel used for tick interrupt of FreeRTOS */
-#define configFreeRTOS_CLOCK_TIMER              0 // TICK TIMER = CMT0
+/* Event group related definitions. */
+#define configUSE_EVENT_GROUPS                     1
+
+/* Run time stats gathering definitions. */
+unsigned long ulGetRunTimeCounterValue( void );
+void vConfigureTimerForRunTimeStats( void );
+#define configGENERATE_RUN_TIME_STATS    0
+//#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()    vConfigureTimerForRunTimeStats()
+//#define portGET_RUN_TIME_COUNTER_VALUE()            ulGetRunTimeCounterValue()
+
+/* Co-routine definitions. */
+#define configUSE_CO_ROUTINES                   0
+#define configMAX_CO_ROUTINE_PRIORITIES         ( 2 )
+
+/* Currently the TCP/IP stack is using dynamic allocation, and the MQTT task is
+ * using static allocation. */
+#define configSUPPORT_DYNAMIC_ALLOCATION        1
+#define configSUPPORT_STATIC_ALLOCATION         1
 
 /* Set the following definitions to 1 to include the API function, or zero
-to exclude the API function. */
+ * to exclude the API function. */
+#define INCLUDE_vTaskPrioritySet                1
+#define INCLUDE_uxTaskPriorityGet               1
+#define INCLUDE_vTaskDelete                     1
+#define INCLUDE_vTaskCleanUpResources           0
+#define INCLUDE_vTaskSuspend                    1
+#define INCLUDE_vTaskDelayUntil                 1
+#define INCLUDE_vTaskDelay                      1
+#define INCLUDE_uxTaskGetStackHighWaterMark     1
+#define INCLUDE_xTaskGetSchedulerState          1
+#define INCLUDE_xTimerGetTimerTaskHandle        0
+#define INCLUDE_xTaskGetIdleTaskHandle          0
+#define INCLUDE_xQueueGetMutexHolder            1
+#define INCLUDE_eTaskGetState                   1
+#define INCLUDE_xEventGroupSetBitsFromISR       1
+#define INCLUDE_xTimerPendFunctionCall          1
+#define INCLUDE_xTaskGetCurrentTaskHandle       1
+#define INCLUDE_xTaskAbortDelay                 1
 
-#define INCLUDE_vTaskPrioritySet			1
-#define INCLUDE_uxTaskPriorityGet			1
-#define INCLUDE_vTaskDelete					1
-#define INCLUDE_vTaskCleanUpResources		0
-#define INCLUDE_vTaskSuspend				1
-#define INCLUDE_vTaskDelayUntil				1
-#define INCLUDE_vTaskDelay					1
-#define INCLUDE_uxTaskGetStackHighWaterMark	1
-#define INCLUDE_xTaskGetSchedulerState		1
-#define INCLUDE_eTaskGetState				1
-#define INCLUDE_xTimerPendFunctionCall		1
-#define INCLUDE_xTaskResume                 1
-#define INCLUDE_xTaskResumeFromISR          1
-#define INCLUDE_xTaskGetCurrentTaskHandle   1
+/* This demo makes use of one or more example stats formatting functions.  These
+ * format the raw data provided by the uxTaskGetSystemState() function in to human
+ * readable ASCII form.  See the notes in the implementation of vTaskList() within
+ * FreeRTOS/Source/tasks.c for limitations.  configUSE_STATS_FORMATTING_FUNCTIONS
+ * is set to 2 so the formatting functions are included without the stdio.h being
+ * included in tasks.c.  That is because this project defines its own sprintf()
+ * functions. */
+#define configUSE_STATS_FORMATTING_FUNCTIONS    1
 
-void vAssertCalled( void );
+#if(1)
+/* Assert call defined for debug builds. */
+extern void vAssertCalled( void );
 #define configASSERT( x ) if( ( x ) == 0 ) vAssertCalled()
 
-/* Override some of the priorities set in the common demo tasks.  This is
-required to ensure flase positive timing errors are not reported. */
-#define bktPRIMARY_PRIORITY		( configMAX_PRIORITIES - 3 )
-#define bktSECONDARY_PRIORITY	( configMAX_PRIORITIES - 4 )
-#define intqHIGHER_PRIORITY		( configMAX_PRIORITIES - 3 )
+//extern TEST_ABORT();
+//#define configASSERT( x )   if( ( x ) == 0 )  TEST_ABORT()
+#endif
+
+/* The function that implements FreeRTOS printf style output, and the macro
+ * that maps the configPRINTF() macros to that function. */
+extern void vLoggingPrintf( const char * pcFormat, ... );
+
+#define configPRINTF( X )    vLoggingPrintf X
 
 
-/*********************************************
- * Amazon FreeRTOS aws_demos project
- ********************************************/
+/* Map the logging task's printf to the board specific output function. */
+#define configPRINT_STRING( x )    uart_string_printf( x );
 
-#define __FUNCTION__ __func__ /* GCC <--> CC-RX */
-#define __attribute__( attr ) /* GCC <--> CC-RX */
+/* Sets the length of the buffers into which logging messages are written - so
+ * also defines the maximum length of each log message. */
+#define configLOGGING_MAX_MESSAGE_LENGTH            120
 
-void vMainUARTPrintString( char * pcString );
-void vLoggingPrintf( const char * pcFormat, ... );
-
-#define configPRINT_STRING( x )    vMainUARTPrintString( x );
-
-#define configLOGGING_MAX_MESSAGE_LENGTH            100
-
+/* Set to 1 to prepend each log message with a message number, the task name,
+ * and a time stamp. */
 #define configLOGGING_INCLUDE_TIME_AND_TASK_NAME    1
 
-/*********************************************
- * FreeRTOS specific demos
- ********************************************/
+/* Application specific definitions follow. **********************************/
+
+/* If configINCLUDE_DEMO_DEBUG_STATS is set to one, then a few basic IP trace
+ * macros are defined to gather some UDP stack statistics that can then be viewed
+ * through the CLI interface. */
+#define configINCLUDE_DEMO_DEBUG_STATS       1
+
+/* The size of the global output buffer that is available for use when there
+ * are multiple command interpreters running at once (for example, one on a UART
+ * and one on TCP/IP).  This is done to prevent an output buffer being defined by
+ * each implementation - which would waste RAM.  In this case, there is only one
+ * command interpreter running, and it has its own local output buffer, so the
+ * global buffer is just set to be one byte long as it is not used and should not
+ * take up unnecessary RAM. */
+#define configCOMMAND_INT_MAX_OUTPUT_SIZE    1
+
+/* Only used when running in the FreeRTOS Windows simulator.  Defines the
+ * priority of the task used to simulate Ethernet interrupts. */
+#define configMAC_ISR_SIMULATOR_PRIORITY     ( configMAX_PRIORITIES - 1 )
+
+/* This demo creates a virtual network connection by accessing the raw Ethernet
+ * or WiFi data to and from a real network connection.  Many computers have more
+ * than one real network port, and configNETWORK_INTERFACE_TO_USE is used to tell
+ * the demo which real port should be used to create the virtual port.  The ports
+ * available are displayed on the console when the application is executed.  For
+ * example, on my development laptop setting configNETWORK_INTERFACE_TO_USE to 4
+ * results in the wired network being used, while setting
+ * configNETWORK_INTERFACE_TO_USE to 2 results in the wireless network being
+ * used. */
+#define configNETWORK_INTERFACE_TO_USE       2L
 
 /* The address of an echo server that will be used by the two demo echo client
  * tasks:
@@ -171,53 +210,70 @@ void vLoggingPrintf( const char * pcFormat, ... );
  * http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html. */
 #define configECHO_SERVER_ADDR0              192
 #define configECHO_SERVER_ADDR1              168
-#define configECHO_SERVER_ADDR2              2
-#define configECHO_SERVER_ADDR3              6
-#define configTCP_ECHO_CLIENT_PORT           7
+#define configECHO_SERVER_ADDR2              1
+#define configECHO_SERVER_ADDR3              200
+#define configTCP_ECHO_CLIENT_PORT           9999
 
 /* Default MAC address configuration.  The demo creates a virtual network
  * connection that uses this MAC address by accessing the raw Ethernet/WiFi data
  * to and from a real network connection on the host PC.  See the
  * configNETWORK_INTERFACE_TO_USE definition above for information on how to
  * configure the real network connection to use. */
-#define configMAC_ADDR0                      0x74
-#define configMAC_ADDR1                      0x90
-#define configMAC_ADDR2                      0x50
-#define configMAC_ADDR3                      0x00
-#define configMAC_ADDR4                      0x79
-#define configMAC_ADDR5                      0x03
+#define configMAC_ADDR0                      0x2E
+#define configMAC_ADDR1                      0x09
+#define configMAC_ADDR2                      0x0A
+#define configMAC_ADDR3                      0x02
+#define configMAC_ADDR4                      0xE0
+#define configMAC_ADDR5                      0x0A
 
 /* Default IP address configuration.  Used in ipconfigUSE_DHCP is set to 0, or
- * ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted.
- * (no effective for RX MCU sample configuration) */
-#define configIP_ADDR0                       0
-#define configIP_ADDR1                       0
-#define configIP_ADDR2                       0
-#define configIP_ADDR3                       0
+ * ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted. */
+#define configIP_ADDR0                       172
+#define configIP_ADDR1                       27
+#define configIP_ADDR2                       49
+#define configIP_ADDR3                       127
 
 /* Default gateway IP address configuration.  Used in ipconfigUSE_DHCP is set to
- * 0, or ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted.
- * (no effective for RX MCU sample configuration) */
-#define configGATEWAY_ADDR0                  0
-#define configGATEWAY_ADDR1                  0
-#define configGATEWAY_ADDR2                  0
-#define configGATEWAY_ADDR3                  0
+ * 0, or ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted. */
+#define configGATEWAY_ADDR0                  172
+#define configGATEWAY_ADDR1                  27
+#define configGATEWAY_ADDR2                  49
+#define configGATEWAY_ADDR3                  1
 
 /* Default DNS server configuration.  OpenDNS addresses are 208.67.222.222 and
  * 208.67.220.220.  Used in ipconfigUSE_DHCP is set to 0, or ipconfigUSE_DHCP is
- * set to 1 but a DNS server cannot be contacted.
- * (no effective for RX MCU sample configuration) */
-#define configDNS_SERVER_ADDR0               0
-#define configDNS_SERVER_ADDR1               0
-#define configDNS_SERVER_ADDR2               0
-#define configDNS_SERVER_ADDR3               0
+ * set to 1 but a DNS server cannot be contacted.*/
+#define configDNS_SERVER_ADDR0               143
+#define configDNS_SERVER_ADDR1               103
+#define configDNS_SERVER_ADDR2               47
+#define configDNS_SERVER_ADDR3               193
 
 /* Default netmask configuration.  Used in ipconfigUSE_DHCP is set to 0, or
- * ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted.
- * (no effective for RX MCU sample configuration) */
-#define configNET_MASK0                      0
-#define configNET_MASK1                      0
-#define configNET_MASK2                      0
+ * ipconfigUSE_DHCP is set to 1 but a DNS server cannot be contacted. */
+#define configNET_MASK0                      255
+#define configNET_MASK1                      255
+#define configNET_MASK2                      255
 #define configNET_MASK3                      0
+
+/* The UDP port to which print messages are sent. */
+#define configPRINT_PORT                     ( 15000 )
+
+#define configPROFILING                      ( 0 )
+
+/* Pseudo random number generater used by some demo tasks. */
+extern uint32_t ulRand();
+#define configRAND32()    ulRand()
+
+
+
+/* Header required for the tracealyzer recorder library. */
+//#include "trcRecorder.h"
+
+/*********************************************
+ * Amazon FreeRTOS aws_demos project
+ ********************************************/
+
+#define __FUNCTION__ __func__ /* GCC <--> CC-RX */
+#define __attribute__( attr ) /* GCC <--> CC-RX */
 
 #endif /* FREERTOS_CONFIG_H */

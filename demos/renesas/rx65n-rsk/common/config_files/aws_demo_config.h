@@ -27,24 +27,12 @@
 #define _AWS_DEMO_CONFIG_H_
 
 /* Number of sub pub tasks that connect to a broker that is not using TLS. */
-#define democonfigMQTT_SUB_PUB_NUM_UNSECURE_TASKS         ( 1 )
+#define democonfigMQTT_SUB_PUB_NUM_UNSECURE_TASKS         ( 0 )
 
 /* Number of sub pub tasks that connect to a broker that is using TLS. */
 #define democonfigMQTT_SUB_PUB_NUM_SECURE_TASKS           ( 1 )
 
-#define democonfigSHADOW_DEMO_NUM_TASKS                   ( 2 )
-
-/* Timeout used when performing MQTT operations that do not need extra time
-to perform a TLS negotiation. */
-#define democonfigMQTT_TIMEOUT						      pdMS_TO_TICKS( 300 )
-
-/* Timeout used when establishing a connection, which required TLS
-* negotiation. */
-#define democonfigMQTT_ECHO_TLS_NEGOTIATION_TIMEOUT       pdMS_TO_TICKS( 12000 )
-
-/* MQTT echo task example parameters. */
-#define democonfigMQTT_ECHO_TASK_STACK_SIZE               ( configMINIMAL_STACK_SIZE * 2 )
-#define democonfigMQTT_ECHO_TASK_PRIORITY                 ( tskIDLE_PRIORITY )
+#define democonfigSHADOW_DEMO_NUM_TASKS                   ( 1 )
 
 /* IoT simple subscribe/publish example task parameters. */
 #define democonfigMQTT_SUB_PUB_TASK_STACK_SIZE            ( configMINIMAL_STACK_SIZE * 5 )
@@ -74,5 +62,19 @@ to perform a TLS negotiation. */
 /* TCP Echo Client tasks multi task example parameters. */
 #define democonfigTCP_ECHO_TASKS_SEPARATE_TASK_STACK_SIZE  ( configMINIMAL_STACK_SIZE * 4 )
 #define democonfigTCP_ECHO_TASKS_SEPARATE_TASK_PRIORITY    ( tskIDLE_PRIORITY )
+
+/* MQTT echo task example parameters. */
+#define democonfigMQTT_ECHO_TASK_STACK_SIZE ( configMINIMAL_STACK_SIZE * 3 )
+#define democonfigMQTT_ECHO_TASK_PRIORITY ( tskIDLE_PRIORITY )
+
+/* Timeout used when establishing a connection, which required TLS
+negotiation. */
+#define democonfigMQTT_ECHO_TLS_NEGOTIATION_TIMEOUT	pdMS_TO_TICKS( 12000 )
+
+/* Timeout used when performing MQTT operations that do not need extra time
+to perform a TLS negotiation. */
+#define democonfigMQTT_TIMEOUT						pdMS_TO_TICKS( 2500 )
+
+
 
 #endif /* _AWS_DEMO_CONFIG_H_ */

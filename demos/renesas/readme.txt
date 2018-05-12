@@ -1,4 +1,137 @@
 ----------------------------------------------
+Getting start for RX65N Amazon FreeRTOS
+----------------------------------------------
+Thank you for interesting about RX65N and Amazon FreeRTOS.
+This guide is for your environment setup and confirm demos behavior.
+
+SheltyDog@Renesas writes this guide and has responsibility of this project.
+If you have any question/suggestion/opinion, please visit following page and post it.
+https://github.com/NoMaY-jp/amazon-freertos/tree/master
+
+Now Amazon provides great real time OS with network software for
+MCU (like some peripheral with 100MHz class CPU) as "Amazon FreeRTOS".
+As you know "Amazon Web Service(AWS)" is one of biggest IoT Cloud Service in W/W.
+"Amazon FreeRTOS" can make a way to connect the "Amazon Web Service" like following steps.
+
+Getting start steps:
+ step1:  Refer to the Development Environment (recommended) section to get the board and tools.
+ step2:  Setup tools for your PC.
+ step3:  Download RX65N Amazon FreeRTOS from GitHub. (Maybe you already done)
+         https://github.com/NoMaY-jp/amazon-freertos/tree/master
+ step4:  Make your AWS account, and make your "Things" on AWS,
+         and enable Security Policy to allow all your device will connect to your "Things".
+ step5:  Make your device certification and private key and settings put this into your source code.
+         /demos/common/include
+          aws_clientcredential.h
+           clientcredentialMQTT_BROKER_ENDPOINT[]
+           clientcredentialIOT_THING_NAME
+          aws_clientcredential_keys.h
+           clientcredentialCLIENT_CERTIFICATE_PEM[]
+           clientcredentialCLIENT_PRIVATE_KEY_PEM[]
+ step6:  Start Renesas IDE (e2 studio) and import Amazon FreeRTOS project
+ step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
+         Refer to following text.
+         /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
+ step8:  Configure your envirionment using Smart Configurator
+         Refer to following text.
+         /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/generate!.txt
+ step9:  Build
+ step10: Execute, confirm console log will show the Echo message from AWS.
+         The log will be output from G1CUSB connector as UART/USB.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+  
+Thanks for Amazon team provides great software as Open Source and great IoT Cloud Service.
+And Thanks for NoMaY-san provides many many useful information to port the Amazon FreeRTOS to RX65N,
+and manages GitHub repository for this project.
+And Thanks for Renesas RX MCUs business unit member funds for me,
+and helps some hardware/software development.
+I hope this solution will be helpful for embedded system developer in W/W.
+
+--------------------------------------------------------------------------
+Change Logs
+--------------------------------------------------------------------------
+v0.01:
+[ADDED] RX65N supports Amazon FreeRTOS Release Version 1.2.3 in tentative.
+        Only confirmed Echo demo using Ethernet.
+
+--------------------------------------------------------------------------
+Development Environment (recommended)
+--------------------------------------------------------------------------
+Board: Renesas Starter Kit+ for RX65N-2MB
+    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
+
+Compiler: CC-RX V2.08 (you need non-expired evaluation license or product license to build Amazon FreeRTOS)
+    [en] https://www.renesas.com/en-us/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
+
+IDE: e2 studio V6.2.0
+    [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/e2studio.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/e2studio.html
+    
+Debugger: E1 Emulator (no need to buy because Renesas Starter Kit has this one into package)
+    [en] https://www.renesas.com/en-us/products/software-tools/tools/emulator/e1.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/emulator/e1.html
+
+Device Driver: RX Driver Package
+    [en] https://www.renesas.com/en-us/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/software-os-middleware-driver/software-package/rx-driver-package.html
+
+Special Device Driver for FreeRTOS:
+    [en] https://www.renesas.com/en-us/products/software-tools/software-os-middleware-driver/software-package/rx-real-time-os-package.html
+    [ja] none
+    
+Comment:
+ Renesas Starter Kit+ for RX65N-2MB is expensive/huge spec for just prototyping phase.
+ I am preparing low-priced/small-spec kit as expansion board for "Target Board for RX Family".
+    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/cpu-mpu-boards/rx-family-target-board.html
+ Current developments is using Ethernet but I will move this to WiFi.
+ And I am also preparing to corresponds to GCC for release from CC-RX compiler limitation.
+ 
+--------------------------------------------------------------------------
+Development Environment (optional)
+--------------------------------------------------------------------------
+Board: RX65N Envision Kit
+    [en] https://www.renesas.com/en-us/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
+
+         The log will be output from CN14(PMOD:1-6pin) connector as UART/USB.
+         Please set baud-rate as 115200bps, 8bit-data, no-parity, 1 stop-bit,
+         and "LF" only as return code for your console.
+         PMOD UART/USB convertor is provided by Digilent.
+         https://store.digilentinc.com/pmod-usbuart-usb-to-uart-interface/
+         
+IDE: CS+
+    [en] https://www.renesas.com/en-us/products/software-tools/tools/ide/csplus.html
+    [ja] https://www.renesas.com/ja-jp/products/software-tools/tools/ide/csplus.html
+
+Comment:
+ RX65N Envision Kit has no parts related Ethernet.
+ Please implements LAN8720A and RJ45 connector onto your RX65N Envision Kit.
+ 
+--------------------------------------------------------------------------
+RX65N Device Introduction
+--------------------------------------------------------------------------
+RX65N is powerful device for IoT embedded system.
+RX65N has some useful peripheral for getting sensor data, control some motors,
+and communication with some devices using USB/Ether/SD card/SDIO/UART/I2C/SPI/etc,
+and original security IP can make "Root of Trust" as device security,
+and LCD controller that can connect to generic LCD
+(recommended 480x272 resolution with double buffer (256x2KB)),
+with huge internal memory (max ROM=2MB, RAM=640KB)
+with powerful/low current consumption (34 CoreMark/mA),
+Renesas original CPU(RXv2 core)@120MHz using 40nm process.
+https://www.renesas.com/en-us/about/press-center/news/2017/news20171113.html
+
+--------------------------------------------------------------------------
+EOF
+--------------------------------------------------------------------------
+Following text is SheltyDog memo written in Japanese.
+Please ignore this in basically.
+
+----------------------------------------------
 Amazon FreeRTOS ƒ|[ƒeƒBƒ“ƒO‹L˜^
 ----------------------------------------------
 ¡”wŒi
@@ -9,31 +142,12 @@ https://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/
 
 –{‹L˜^‚Íu‚©‚Ó‚¥ƒ‹ƒlv‚ÅŠˆ“®‚·‚éƒVƒFƒ‹ƒeƒB‚ª‹L‚·B
 
-test
-
---------------------------------------------------------------------------
-¡ŠJ”­ŠÂ‹«
---------------------------------------------------------------------------
-ƒ{[ƒhFRX65N Envision Kit 
-        https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-promotion-boards/rx65n-envision-kit.html
-        Renesas Starter Kit+ for RX65N-2MB (Trusted Secure IP“‹Ú)@¦
-        https://www.renesas.com/ja-jp/products/software-tools/boards-and-kits/renesas-starter-kits/renesas-starter-kitplus-for-rx65n-2mb.html
-ƒfƒoƒbƒKFE2OB(RX65N Envision Kit‚Ìê‡(ƒIƒ“ƒ{[ƒh‚È‚Ì‚Å’Ç‰Áw“ü•s—v))
-          E1ƒGƒ~ƒ…ƒŒ[ƒ^(RX65N Starter Kit+ for RX65N-2MB‚Ìê‡(ƒLƒbƒg‚É•t‘®‚Ì‚½‚ß’Ç‰Áw“ü•s—v))
-ƒRƒ“ƒpƒCƒ‰FCC-RX V2.08
-        https://www.renesas.com/ja-jp/products/software-tools/tools/compiler-assembler/compiler-package-for-rx-family-e2studio.html
-IDEFe2 studio V6.2.0
-        https://www.renesas.com/ja-jp/products/software-tools/tools/ide/e2studio.html
-    ¦ŠJ”­‚ÍRX65N Envision Kit ‚Ås‚¢A
-    @“K‹XRenesas Starter Kit+ for RX65N-2MB (Trusted Secure IP“‹Ú)‚Å‚à
-@@@“®‚­‚æ‚¤‚É‚·‚éB
-
 --------------------------------------------------------------------------
 ¡i’»
 --------------------------------------------------------------------------
 RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ‚µ‚Ü‚·B
 ‰º‹L Amazon FreeRTOS 1.2.x ‚Í“K‹XÅVƒR[ƒh‚ÉXV‚µ‚Ä‚¢‚«‚Ü‚·B
-2018/03/17“_‚Å‚Ì“K—pƒR[ƒh‚Í 1.2.2 ‚Å‚·B
+2018/04/30“_‚Å‚Ì“K—pƒR[ƒh‚Í 1.2.3 ‚Å‚·B
 
 ‡@ƒ‹ƒlƒTƒXTCP/IP‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚éiEther‚Ì“®ìŠm”Fj
 ‡ASDIO–³üLAN‚ğ“®ìŠm”F‚µ‚½Šú‚ÌFreeRTOS 8.2.2‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
@@ -44,19 +158,22 @@ RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ
 ‡FAmazon FreeRTOS 1.2.x‚ÌMQTT•”•ª‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚éiAWS‚Ö‚ÌÚ‘±ÀŒ±j
 ‡GAmazon FreeRTOS 1.2.x‚ÌFreeRTOS+TCP•”•ª‚Ìƒlƒbƒgƒ[ƒN‘w‚ÌŒ‹‡•”•ª‚ğH•v‚µ‚ÄA
 @(1)EtherA(2)SPIÚ‘±–³üLANƒ‚ƒWƒ…[ƒ‹A(3)SDIO–³üLANƒ‚ƒWƒ…[ƒ‹‚Ì3í—Ş‚ğ
-@Ø‚è‘Ö‚¦‚ç‚ê‚é‚æ‚¤‚É‚·‚é@š‚¢‚Ü‚±‚±—ƒVƒFƒ‹ƒeƒB
+@Ø‚è‘Ö‚¦‚ç‚ê‚é‚æ‚¤‚É‚·‚é@šˆê’U’â~AŒã‚Ù‚Ç(2)‚Éi‚Á‚ÄÄŠJ
 ‡HAmazon FreeRTOS 1.2.x‚Ìmbed TLS•”•ª‚ÌˆÃ†ˆ—ƒvƒŠƒ~ƒeƒBƒu‚Ì
 @ƒ\ƒtƒgƒEƒFƒAÀ‘•iAES‚Æ‚©RSA‚Æ‚©j‚ğRX65N“à‘ ˆÃ†Ší‚ğg‚Á‚½
-@ƒn[ƒhƒEƒFƒAÀ‘•‚É’u‚«Š·‚¦‚é@š‚¢‚Ü‚±‚±—‹¦—Í‰ïĞ
-‡IEther‘w‚Ìƒ[ƒƒRƒs[‚É‘Î‰‚·‚é
-‡JAmazon FreeRTOS–{‰ÆŠÂ‹«‚Éƒ}[ƒW‚µAAmazon FreeRTOS–{‰ÆƒR[ƒh‚Ö‚Ì’Ç]‚ğŠÈ’P‚É‚Å‚«‚é‚æ‚¤‚É‚·‚é
+@ƒn[ƒhƒEƒFƒAÀ‘•‚É’u‚«Š·‚¦‚é@šˆê’U’â~
+‡IEther‘w‚Ìƒ[ƒƒRƒs[‚É‘Î‰‚·‚é@šˆê’U’â~
+‡JAmazon FreeRTOS–{‰ÆŠÂ‹«‚Éƒ}[ƒW‚µAAmazon FreeRTOS–{‰ÆƒR[ƒh‚Ö‚Ì’Ç]‚ğŠÈ’P‚É‚Å‚«‚é‚æ‚¤‚É‚·‚é@š‚¢‚Ü‚±‚±—ƒVƒFƒ‹ƒeƒB
 ‡KAmazon FreeRTOS ‚ÌGit‚Ìfork‚É“o˜^‚·‚é
 ‡LAmazon FreeRTOS ‚ÌCertification‚ğóŒ±‚µ‡Ši‚µGit‚Ì–{‰Æ‚É“o˜^‚·‚é
-@docs.aws.amazon.com/.../freertos-qualification-program.html
+@https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
 
 --------------------------------------------------------------------------
 ¡‰Û‘è‚Ü‚Æ‚ßš
 --------------------------------------------------------------------------
+@2018/05/01
+@@2018/05/01‚Ìƒ|[ƒeƒBƒ“ƒO‹L˜^QÆ
+@
 @2018/03/17
 @@2018/03/17‚Ìƒ|[ƒeƒBƒ“ƒO‹L˜^QÆ
 @@
@@ -67,7 +184,7 @@ RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ
 @@(5)LANƒP[ƒuƒ‹‘}”²‚ÌƒCƒxƒ“ƒg‚ğTCP/IP‘¤‚É’Ê’m‚·‚éd‘g‚İ‚ª‚ ‚é‚ª...š
 
 @@‚»‚Ì‘¼
-@@EƒVƒXƒeƒ€ƒƒO‚ğSCI‚©‚ço—Í‚·‚é‚æ‚¤‚ÉƒR[ƒh’Ç‰Á‚·‚ê‚Î‚æ‚¢B(šŒã‚Åƒƒ“ƒe)
+@@EƒVƒXƒeƒ€ƒƒO‚ğSCI‚©‚ço—Í‚·‚é‚æ‚¤‚ÉƒR[ƒh’Ç‰Á‚·‚ê‚Î‚æ‚¢B(šŒã‚Åƒƒ“ƒe)ËŠ®—¹B
 @@EƒRƒ“ƒpƒCƒ‹‘Oˆ—‚Ì\•¶‰ğÍ‚ÅƒGƒ‰[‚É‚È‚Á‚Ä‚¢‚éŠ´‚¶B¨šƒc[ƒ‹ŠJ”­•”–å‚É–â‚¢‡‚í‚¹‚Ä‚İ‚éB
 
 @‚»‚Ì‘¼
@@ -77,6 +194,136 @@ RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ
 --------------------------------------------------------------------------
 ¡ƒ|[ƒeƒBƒ“ƒO‹L˜^	šˆó‚ª‰ğŒˆ‚·‚×‚«‰Û‘è
 --------------------------------------------------------------------------
+2018/05/12
+@NoMaY‚ÉƒAƒhƒoƒCƒX‚ğ‚¢‚½‚¾‚«A5/1‰Û‘è‚É‘Î‚µ‚ÄˆÈ‰º•ûj‚Æ‚µ‚½B
+@EˆÈ‰ºƒ{[ƒhˆË‘¶‚ª–³‚¢ƒR[ƒh(‘S‚­“¯‚¶‚É‚È‚Á‚½)‚È‚Ì‚Å1ŠK‘wUP‚µ‚Äƒ}[ƒW‚·‚éB
+@@ËŒ»óˆÛB
+@@@NoMaYFƒtƒ‰ƒbƒVƒ…‚ÌƒuƒƒbƒNƒTƒCƒY‚ª‹@í–ˆ‚ÉˆÙ‚È‚é‚½‚ß•ª‚¯‚Ä‚¨‚¢‚½‚Ù‚¤‚ªŒãXŠyB
+@@@@ËƒVƒFƒ‹ƒeƒBFYESB‚½‚¾AƒuƒƒbƒNƒTƒCƒY‚Íƒtƒ‰ƒbƒVƒ…ƒ‚ƒWƒ…[ƒ‹‚Ì‹¤’Êƒ}ƒNƒ–¼‚Å”»•Ê‚Å‚«‚é‚Ì‚Å
+@@@@@«—ˆ“I‚É‚Í‚â‚Í‚èƒ}[ƒW‚Å‚«‚é‰Â”\«‚à‚ ‚è‚»‚¤B
+@EBSP‚âƒhƒ‰ƒCƒo‚ÍAˆÈ‰ºƒtƒHƒ‹ƒ_‚É“ü‚ê‚é‚Ì‚ª‚¨ì–@‚Ì‚æ‚¤‚¾B‚»‚Ì‚¤‚¿ˆø‚Á‰z‚µ‚·‚éB
+@@ËŒ»óˆÛB
+@@@NoMaYFƒXƒ}[ƒgƒRƒ“ƒtƒBƒOƒŒ[ƒ^‚Ìd—l‚Æ‡‚í‚¹‚ç‚ê‚È‚¢B
+@@@@ËƒVƒFƒ‹ƒeƒBF”cˆ¬BŒ»óˆÛ‚Æ‚µ‚½‚¢B
+@@@@@‘¼ƒxƒ“ƒ_‚Æ—‚½\¬‚É‚·‚×‚­AŒp‘±‹c˜_‚Í•K—vB
+@@@@@iƒXƒ}[ƒgƒRƒ“ƒtƒBƒOƒŒ[ƒ^‚Å‘Î‰‚Å‚«‚é•û–@‚ğl‚¦‚é‚È‚Çj
+@
+@–{“ú‚ÌŠˆ“®‚ÍAGitHub‚Ö‚ÌƒR[ƒh“o˜^BNoMaY‚Æ‘Š’k‚µ‚Ğ‚Æ‚Ü‚¸‚Ív1.2.3‚ÌŒ»ó‚Å“o˜^‚·‚é‚Ì‚ª
+@—Ç‚¢‚Å‚ ‚ë‚¤‚Æ‚Ì‚±‚ÆB‚³‚µ‚ ‚½‚èAˆÈ‰º3“_‚ğ‘Îˆ‚·‚ê‚ÎŒ»ó‚Ì‚à‚Ì‚ğƒAƒbƒvƒ[ƒh‚Å‚«‚éB
+@@(1)AWSÚ‘±—pƒAƒJƒEƒ“ƒgî•ñ(ƒfƒoƒCƒXØ–¾‘A”é–§Œ®)‚Ìƒf[ƒ^‚ğíœ
+@@(2)AWSÚ‘±—pƒAƒJƒEƒ“ƒgî•ñ‚Ìİ’è•û–@AƒfƒoƒCƒXƒhƒ‰ƒCƒo‚ÌƒCƒ“ƒXƒg[ƒ‹•û–@A
+@@@ ƒfƒ‚‚Ì“®ìŠm”F•û–@A‰ü’ù—š—ğ‚È‚ÇƒXƒ^[ƒgƒAƒbƒvƒKƒCƒh‚ğ–{‘‚Ìæ“ª‚É‹L‚·B
+@@@ ƒXƒ^[ƒgƒAƒbƒvƒKƒCƒh‚Í‰pŒêA“ú–{Œê•¹‹L‚Æ‚µ
+@@@ ƒ|[ƒeƒBƒ“ƒO‹L˜^©‘Ì‚Í“ú–{Œê‚Å—Ç‚¢‚Å‚ ‚ë‚¤B
+@@(3)ƒ‹ƒlƒTƒX‚ÌƒfƒoƒCƒXƒhƒ‰ƒCƒo‚ÌƒR[ƒh‚ğíœ‚µ‚Ä‚¨‚­B(NoMaY‚Ì¬‰Ê‚ğg‚í‚¹‚Ä‚¢‚½‚¾‚­)
+@@
+2018/05/01
+@íX’²®‚ğŒo‚ÄˆÈ‰º4í—Ş‚ÌƒvƒƒWƒFƒNƒg‚Ì“®ìŠm”F‚ªŠ®—¹B
+@Amazon FreeRTOS 1.2.3 ‚Æ“¯‚¶\‘¢‚Éo—ˆ‚½B
+@(1)RX65N RSK/CS+
+@(2)RX65N RSK/e2 studio
+@(3)RX65N Envision Kit/CS+
+@(4)RX65N Envision Kit/e2 studio
+@
+@ˆÈ‰º‚ª‰Û‘èBš
+@EAWS IoT‚ÌƒAƒJƒEƒ“ƒg‚É•R‚Ã‚¢‚½"ƒ‚ƒm"‚ÌƒfƒoƒCƒXØ–¾‘A”é–§Œ®î•ñ‚ğ
+@@RX65N‘¤‚É‚½‚¹‚Ä‚¨‚­•K—v‚ª‚ ‚éB
+@@Œ»İ‚ÍAˆÈ‰ºƒ\[ƒXƒR[ƒh‚É–„‚ß‚ñ‚Å‚ ‚éB
+@@@\demos\common\include\aws_clientcredential.h
+@@@@EclientcredentialMQTT_BROKER_ENDPOINT[]
+@@@@EclientcredentialIOT_THING_NAME
+@@@\demos\common\include\aws_clientcredential_keys.h
+@@@@EclientcredentialCLIENT_CERTIFICATE_PEM
+@@@@EclientcredentialCLIENT_PRIVATE_KEY_PEM
+@@@@
+@@@ƒƒOƒCƒ“‚·‚é‚Æ‚«‚É•K—v‚Èƒf[ƒ^‚Å‚ ‚é‚ªAÀÛ‚Í‚±‚Ì’l‚Íƒ†[ƒU–ˆ‚ÉˆÙ‚È‚éB
+@@@STM32‚ÌŠÂ‹«‚Å‚ÍAƒVƒXƒeƒ€‰‰ñ‹N“®‚Éã‹Lƒf[ƒ^‚ğƒRƒ“ƒ\[ƒ‹‚©‚ç“ü—Í‚·‚é
+@@@•û®‚É‚È‚Á‚Ä‚¢‚é‚æ‚¤‚¾B³®ƒŠƒŠ[ƒX‚Ü‚Å‚É‚ÍA^—‚µ‚ÄƒVƒXƒeƒ€‚ğì‚é•K—v‚ª‚ ‚éB
+@@@i‚¢‚Ü‚ÌƒR[ƒh‚ÍƒVƒFƒ‹ƒeƒB‚ÌƒAƒJƒEƒ“ƒg‚ÉŒq‚ª‚é‚Ì‚Å‚¢‚½‚¸‚ç‚µ‚È‚¢‚Å‚­‚¾‚³‚¢‚Ëj
+@ENIST FIPS140-2‚Å‚Í”é–§Œ®‚Ì‚æ‚¤‚ÉƒVƒXƒeƒ€ƒZƒLƒ…ƒŠƒeƒB‚Ì—v‚É‚È‚éƒf[ƒ^‚ğ
+@@Critical Security Parameter(CSP)‚ÆŒÄÌ‚µA“KØ‚É’è‚ß‚½ˆÃ†‹«ŠE‚Ì’†‚Å‚Ì‚İˆµ‚¤‚æ‚¤‚É
+@@’è‚ß‚Ä‚¢‚éB’Êí‚Ìƒ}ƒCƒRƒ“‚¾‚ÆˆÃ†‹«ŠE‚ª–³‚¢‚½‚ß‚±‚Ì—vŒ‚ğ–‚½‚¹‚È‚¢‚ªA
+@@RX65N“‹Ú‚ÌTrusted Secure IP‚Å‚Í‚±‚Ì”é–§Œ®‚Í‚à‚Æ‚æ‚èASSL/TLS‚ÌƒZƒbƒVƒ‡ƒ“Œ®‚ÉŠ‚é‚Ü‚Å
+@@‚·‚×‚Ä‚ÌCSP‚ğTrusted Secure IP‚Ì’†(ˆÃ†‹«ŠE‚Ì’†)‚Åˆµ‚¦‚é‚æ‚¤‚ÉİŒv‚µ‚Ä‚ ‚éB
+@@Œ»ó‚Ìmbed TLS‚ÌƒR[ƒh‚Ì‚Ü‚Ü‚¾‚ÆAƒZƒbƒVƒ‡ƒ“Œ®‚â”é–§Œ®‚ªƒfƒoƒbƒK‚âƒR[ƒhãŠÛŒ©‚¦‚Å‚ ‚é‚ªA
+@@«—ˆ‚±‚ê‚ğTrusted Secure IP‚É”é“½‚µ‚½‚Ü‚ÜˆÃ†’ÊM‚ªs‚¦‚é‚æ‚¤‰ü—Ç‚µ‚Ä‚¢‚­—\’èB
+@E‚Ü‚¾ƒfƒ‚u\demos\commonv‚Ì‚¤‚¿AƒGƒR[‚Ìƒfƒ‚‚µ‚©“®‚¢‚Ä‚È‚¢
+@@‚»‚Ì‘¼‚Ìƒfƒ‚‚à“®ìŠm”F‚µ‚Ä‚¢‚­B“Á‚ÉOTA‚Ìƒfƒ‚‚É’…–ÚB
+@Ee2 studio‚ÌŠÂ‹«‚ÌƒtƒHƒ‹ƒ_\¬‚ªÀ•¨‚Æ‚Ü‚¾‡‚Á‚Ä‚È‚¢BC³‚·‚éB(CS+‚Í‚Å‚«‚½)
+@EˆÈ‰º‚Íƒ{[ƒhˆË‘¶‚ª–³‚¢ƒR[ƒh(‘S‚­“¯‚¶‚É‚È‚Á‚½)‚È‚Ì‚Å1ŠK‘wUP‚µ‚Äƒ}[ƒW‚·‚éB
+@@@\lib\ota\portable\renesas\rx65n-envision-kit\aws_ota_pal.c
+@@@\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c
+@@@\lib\pkcs11\portable\renesas\rx65n-envision-kit\pkcs11.c
+@@@\lib\pkcs11\portable\renesas\rx65n-rsk\pkcs11.c
+@@@\lib\secure_sockets\portable\renesas\rx65n-envision-kit\aws_secure_sockets.c
+@@@\lib\secure_sockets\portable\renesas\rx65n-rsk\aws_secure_sockets.c
+@EBSP‚âƒhƒ‰ƒCƒo‚ÍAˆÈ‰ºƒtƒHƒ‹ƒ_‚É“ü‚ê‚é‚Ì‚ª‚¨ì–@‚Ì‚æ‚¤‚¾B‚»‚Ì‚¤‚¿ˆø‚Á‰z‚µ‚·‚éB
+@@@\lib\third_party\mcu_vendor\renesas\
+@@@@ËDriverLibName‚Æ‚ ‚é‚Ì‚ÅAƒxƒ“ƒ_‚ªD‚«‚È–¼‘O‚ğ•t‚¯‚ç‚ê‚é‚æ‚¤‚¾B
+@@@@@‰½‚É‚µ‚æ‚¤‚©‚ÈH
+@@@@@Ë‘f’¼‚ÉAurx_driver_packagev‚É‚µ‚æ‚¤B
+
+2018/04/30
+@‚±‚±1‚©Œ‚ÍĞ“à’²®‚É–z‘–BƒR[ƒh‚Ì’²®‚ÍƒAƒƒŠƒJ‚ÌŠJ”­•”‘à‚É”C‚¹‚½B
+@ƒAƒƒŠƒJ‚ÌŠJ”­•”‘à‚Ì’²®‚É‚æ‚èAmazon FreeRTOS Qualification Program‚Ì‡Ši‚É–Ú“r‚ª—§‚Á‚½B
+@‚Ü‚½A‹¦—Í‰ïĞ‚Æ‚ÌŒ_–ñ‚Í4Œ‚ÍØ‚ê‚Ä‚¨‚èi’»–³‚µB
+@5ŒˆÈ~ÄŒ_–ñ‚ğŒ‹‚ÑFreeRTOS+TCP‚Ö‚ÌIGMP‹@”\’Ç‰Á‚ÆGCC‘Î‰‚ği‚ß‚Ä‚à‚ç‚¤‚æ‚¤’²®‚µ‚½B
+@ƒVƒFƒ‹ƒeƒB‚ÍARX65N Amazon FreeRTOS—p‚Ìƒ{[ƒhd—l‚ğW/Wƒƒ“ƒo[ŠÔ‚ÅŒŸ“¢B
+@‚±‚±‚Å‚ÍÚ×‚Í•š‚¹‚é‚ªƒS[ƒ‹‚ªŒ©‚¦‚Ä‚«‚½ó‹µB
+@ƒfƒoƒCƒXƒhƒ‰ƒCƒo‚ÌÄ”z•z‚É‚Â‚¢‚ÄƒŠ[ƒKƒ‹ƒ`[ƒ€‚Æ‹¦‹c’†A
+@–³üLANƒ‚ƒWƒ…[ƒ‹(Silex SX-ULPGN)‚Ì“ú–{‘“à‹Z“Kæ“¾‚ª‘å‚«‚È‰Û‘èB
+@
+@‚Ü‚½AƒZƒLƒ…ƒŠƒeƒBIP˜AŒg‚âSDIO˜AŒg‚ğˆê’U’â~‚µA
+@ƒ{[ƒh”Ì”„‚ğ—Dæ‚³‚¹‚é‚æ‚¤‘S‘Ì•ûj‚ğXVBˆÈ‰ºi’»•\‚àXV‚·‚éB
+
+    ------------------------------------
+    RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ‚µ‚Ü‚·B
+    ‰º‹L Amazon FreeRTOS 1.2.x ‚Í“K‹XÅVƒR[ƒh‚ÉXV‚µ‚Ä‚¢‚«‚Ü‚·B
+    2018/04/30“_‚Å‚Ì“K—pƒR[ƒh‚Í 1.2.3 ‚Å‚·B
+
+    ‡@ƒ‹ƒlƒTƒXTCP/IP‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚éiEther‚Ì“®ìŠm”Fj
+    ‡ASDIO–³üLAN‚ğ“®ìŠm”F‚µ‚½Šú‚ÌFreeRTOS 8.2.2‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
+    ‡Bƒ‹ƒlƒTƒX‚ÌFreeRTOSƒpƒbƒP[ƒWA9.0.0‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
+    ‡CAmazon FreeRTOS 1.2.x‚ÌFreeRTOS•”•ª‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
+    ‡DAmazon FreeRTOS 1.2.x‚ÌFreeRTOS+TCP•”•ª‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
+    ‡EAmazon FreeRTOS 1.2.x‚Ìmbed TLS•”•ª‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚é
+    ‡FAmazon FreeRTOS 1.2.x‚ÌMQTT•”•ª‚ğƒ^[ƒQƒbƒg‚Å“®ì‚³‚¹‚éiAWS‚Ö‚ÌÚ‘±ÀŒ±j
+    ‡GAmazon FreeRTOS 1.2.x‚ÌFreeRTOS+TCP•”•ª‚Ìƒlƒbƒgƒ[ƒN‘w‚ÌŒ‹‡•”•ª‚ğH•v‚µ‚ÄA
+    @(1)EtherA(2)SPIÚ‘±–³üLANƒ‚ƒWƒ…[ƒ‹A(3)SDIO–³üLANƒ‚ƒWƒ…[ƒ‹‚Ì3í—Ş‚ğ
+    @Ø‚è‘Ö‚¦‚ç‚ê‚é‚æ‚¤‚É‚·‚é@šˆê’U’â~AŒã‚Ù‚Ç(2)‚Éi‚Á‚ÄÄŠJ
+    ‡HAmazon FreeRTOS 1.2.x‚Ìmbed TLS•”•ª‚ÌˆÃ†ˆ—ƒvƒŠƒ~ƒeƒBƒu‚Ì
+    @ƒ\ƒtƒgƒEƒFƒAÀ‘•iAES‚Æ‚©RSA‚Æ‚©j‚ğRX65N“à‘ ˆÃ†Ší‚ğg‚Á‚½
+    @ƒn[ƒhƒEƒFƒAÀ‘•‚É’u‚«Š·‚¦‚é@šˆê’U’â~
+    ‡IEther‘w‚Ìƒ[ƒƒRƒs[‚É‘Î‰‚·‚é@šˆê’U’â~
+    ‡JAmazon FreeRTOS–{‰ÆŠÂ‹«‚Éƒ}[ƒW‚µAAmazon FreeRTOS–{‰ÆƒR[ƒh‚Ö‚Ì’Ç]‚ğŠÈ’P‚É‚Å‚«‚é‚æ‚¤‚É‚·‚é@š‚¢‚Ü‚±‚±—ƒVƒFƒ‹ƒeƒB
+    ‡KAmazon FreeRTOS ‚ÌGit‚Ìfork‚É“o˜^‚·‚é
+    ‡LAmazon FreeRTOS ‚ÌCertification‚ğóŒ±‚µ‡Ši‚µGit‚Ì–{‰Æ‚É“o˜^‚·‚é
+    @https://docs.aws.amazon.com/freertos/latest/userguide/freertos-qualification-program.html
+    ------------------------------------
+
+@GWŠúŠÔ’†‚ÍAˆÈ‰º’²®‚ğs‚¤B
+@(1)RX65N Amazon FreeRTOSƒR[ƒh‚Ìƒ}[ƒW(NoMaY”ÅAƒ‹ƒlƒTƒXƒAƒƒŠƒJ”ÅAƒVƒFƒ‹ƒeƒB”Å)Ë‡J`‡K
+@(2)Amazon Web Service‚Ì•×‹­
+@(3)Silex SX-ULPGN‚Ìƒhƒ‰ƒCƒoì‚èË‡G‚Ì(2)‘Î‰ <ÀÛ‚Í’n‚È‚ç‚µ‚¾‚¯‚µ‚Ä5Œ‚©‚ç•¾‰Û‚É—ˆ‚éŒ¤C¶‚Éì‚Á‚Ä‚à‚ç‚¤>
+
+@‚»‚ê‚Å‚Íì‹ÆŠJnB‚Ü‚¸‚Í(1)‚©‚çB
+@(1)RX65N Amazon FreeRTOSƒR[ƒh‚Ìƒ}[ƒW(NoMaY”ÅAƒ‹ƒlƒTƒXƒAƒƒŠƒJ”ÅAƒVƒFƒ‹ƒeƒB”Å)Ë‡J`‡K
+
+@ìí‚ğl‚¦‚éB‚Ü‚¸‚Í“®ìŠm”Fó‹µ‚ğƒ}ƒgƒŠƒNƒX‰»B
+@			NoMaY”Å	ƒAƒƒŠƒJ”Å	ƒVƒFƒ‹ƒeƒB”Å
+@ƒrƒ‹ƒh		Z		Z		Z
+@³í“®ì		~		Z		Z
+@ƒtƒHƒ‹ƒ_ˆÊ’u”ñˆË‘¶	Z		~		Z
+@GitHubƒx[ƒX		Z		~		~
+@ŒŸ’è‡Ši		~		Z		~
+@ƒx[ƒXƒo[ƒWƒ‡ƒ“	1.2.3		1.2.0?		1.2.3
+@
+@•\‚ğŒ©‚Ä‚İ‚é‚ÆANoMaY”Å‚ÌƒvƒƒWƒFƒNƒg‚ÉƒAƒƒŠƒJ”Å‚ÌƒR[ƒh‚Åã‘‚«‚·‚ê‚Î—Ç‚³‚»‚¤‚¾B
+@³í“®ì‚µ‚½‚ç‰ü‚ß‚Ä–{‰Æ‚Ì1.2.3‚Æƒ}[ƒW‚·‚ê‚Î‚æ‚¢B
+@ƒ}[ƒWƒc[ƒ‹‚Å‚Ğ‚½‚·‚çƒAƒƒŠƒJ”ÅËNoMaY”Å‚ÌƒR[ƒh‚Éã‘‚«‚µ‚Ä‚¢‚­B
+@NoMaY‚ÌƒR[ƒh‚ÍAGitHub‚©‚ç4/29 (Amazon FreeRTOS 1.2.3)‚ÉClone‚µ‚½‚à‚ÌB
+@ƒAƒƒŠƒJ”Å‚ÌƒR[ƒh‚ÍAAmazonFreeRTOS_04052018.zip‚ğ—p‚¢‚½B
+@
 2018/03/17
 @‹¦—Í‰ïĞ‚ÉˆË—Š‚µ‚½i’»‡E‡F‚ª–ß‚Á‚Ä‚«‚½B
 @3/3•ª‚Ì¬‰Ê‚É‘Î‚µAAWSÚ‘±(MQTTÀ‘•‚ÆSSL/TLSÀ‘•)‚ªo—ˆ‚½‚æ‚¤‚¾B

@@ -1,243 +1,447 @@
-/*
-FreeRTOS+TCP V2.0.1
-Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
-the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
- http://aws.amazon.com/freertos
- http://www.FreeRTOS.org
-*/
-
-/* Standard includes. */
-#include <stdio.h>
+/***********************************************************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only intended for use with Renesas products. No
+* other uses are authorized. This software is owned by Renesas Electronics Corporation and is protected under all
+* applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED. TO THE MAXIMUM
+* EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES
+* SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR ANY REASON RELATED TO THIS
+* SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software and to discontinue the availability of
+* this software. By using this software, you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+*
+* Copyright (C) 2018 Renesas Electronics Corporation. All rights reserved.
+***********************************************************************************************************************/
+/***********************************************************************************************************************
+* File Name    : NetworkInterface.c
+* Device(s)    : RX
+* Description  : Interfaces FreeRTOS TCP/IP stack to RX Ethernet driver.
+***********************************************************************************************************************/
+/***********************************************************************************************************************
+* History : DD.MM.YYYY Version  Description
+*         : 07.03.2018 0.1     Development
+***********************************************************************************************************************/
+/***********************************************************************************************************************
+Includes   <System Includes> , "Project Includes"
+***********************************************************************************************************************/
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
-#include "semphr.h"
-
-/* FreeRTOS+TCP includes. */
 #include "FreeRTOS_IP.h"
-#include "FreeRTOS_UDP_IP.h"
-#include "FreeRTOS_Sockets.h"
-#include "NetworkBufferManagement.h"
 #include "FreeRTOS_IP_Private.h"
-
-/* Hardware includes. */
-#include "r_ether_rx_if.h"
-
-/* Demo includes. */
+#include "NetworkBufferManagement.h"
 #include "NetworkInterface.h"
 
-/* include FIT module */
-#include "platform.h"
-#include "r_cmt_rx_if.h"
+/* Renesas */
+#include "r_ether_rx_if.h"
+#include "r_pinset.h"
 
-#if ipconfigETHERNET_DRIVER_FILTERS_FRAME_TYPES != 1
-	#define ipCONSIDER_FRAME_FOR_PROCESSING( pucEthernetBuffer ) eProcessBuffer
-#else
-	#define ipCONSIDER_FRAME_FOR_PROCESSING( pucEthernetBuffer ) eConsiderFrameForProcessing( ( pucEthernetBuffer ) )
-#endif
+extern int32_t callback_ether_regist();
 
-/* When a packet is ready to be sent, if it cannot be sent immediately then the
-task performing the transmit will block for niTX_BUFFER_FREE_WAIT
-milliseconds.  It will do this a maximum of niMAX_TX_ATTEMPTS before giving
-up. */
-#define niTX_BUFFER_FREE_WAIT	( ( TickType_t ) 2UL / portTICK_PERIOD_MS )
-#define niMAX_TX_ATTEMPTS		( 5 )
-
-/* The length of the queue used to send interrupt status words from the
-interrupt handler to the deferred handler task. */
-#define niINTERRUPT_QUEUE_LENGTH	( 10 )
-
+/***********************************************************************************************************************
+ Macro definitions
+ **********************************************************************************************************************/
 #define ETHER_BUFSIZE_MIN 60
 
-/*-----------------------------------------------------------*/
-
-/*
- * A deferred interrupt handler task that processes
- */
-extern void vEMACHandlerTask( void *pvParameters );
-
-/*-----------------------------------------------------------*/
-
-/* The queue used to communicate Ethernet events with the IP task. */
-extern QueueHandle_t xNetworkEventQueue;
-
-/* The semaphore used to wake the deferred interrupt handler task when an Rx
-interrupt is received. */
-SemaphoreHandle_t xEMACRxEventSemaphore = NULL;
-/*-----------------------------------------------------------*/
-
-void check_ether_link(void);
-void receive_check(void);
 void get_random_number(uint8_t *data, uint32_t len);
 
-int32_t lan_open(void);
-int32_t lan_open(void);
-int32_t lan_read(uint32_t lan_port_no, uint32_t **buf);
-int32_t lan_write(uint8_t lan_port_no, uint8_t *header , uint32_t header_len, uint8_t *data , uint32_t data_len);
-int32_t rcv_buff_release(uint8_t lan_port_no);
-
+/***********************************************************************************************************************
+ Private global variables and functions
+ **********************************************************************************************************************/
+static TaskHandle_t ether_receive_check_task_handle = 0;
+static TaskHandle_t xTaskToNotify = NULL;
 static TimerHandle_t timer_handle;
 static uint32_t timer_id;
-static TaskHandle_t ether_receive_check_task_handle;
+
 static uint32_t tcpudp_time_cnt;
-volatile uint8_t  pause_enable = ETHER_FLAG_OFF;
-volatile uint8_t  magic_packet_detect[ETHER_CHANNEL_MAX];
-volatile uint8_t  link_detect[ETHER_CHANNEL_MAX];
 
-static const uint8_t renesas_mac_address[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADDR2, configMAC_ADDR3, configMAC_ADDR4, configMAC_ADDR5};
 
-static int32_t callback_ether_regist(void);
-static void callback_ether(void * pparam);
-static void callback_wakeon_lan(uint32_t channel);
-static void callback_link_on(uint32_t channel);
-static void callback_link_off(uint32_t channel);
+static int16_t SendData( uint8_t *pucBuffer, size_t length );
+static int InitializeNetwork(void);
+static void check_ether_link(TimerHandle_t xTimer );
+static void prvEMACDeferredInterruptHandlerTask( void *pvParameters );
 
-static void lan_inthdr(void *ppram);
 
+/***********************************************************************************************************************
+ * Function Name: xNetworkInterfaceInitialise ()
+ * Description  : Initialization of Ethernet driver.
+ * Arguments    : none
+ * Return Value : pdPASS, pdFAIL
+ **********************************************************************************************************************/
 BaseType_t xNetworkInterfaceInitialise( void )
 {
-	BaseType_t return_code = pdFALSE;
-	uint32_t channel;
+    BaseType_t xReturn;
 
-	if(lan_open() == 0)
-	{
-		return_code = pdTRUE;
-	}
+    /*
+     * Perform the hardware specific network initialization here using the Ethernet driver library to initialize the
+     * Ethernet hardware, initialize DMA descriptors, and perform a PHY auto-negotiation to obtain a network link.
+     *
+     * InitialiseNetwork() uses Ethernet peripheral driver library function, and returns 0 if the initialization fails.
+     */
+    if( InitializeNetwork() == pdFALSE )
+    {
+        xReturn = pdFAIL;
+    }
+    else
+    {
+        xReturn = pdPASS;
+    }
 
-	timer_id = 1;
-	timer_handle = xTimerCreate("ETHER_TIMER", 10, pdTRUE, &timer_id, check_ether_link);
-	xTimerStart(timer_handle, 0);
+    return xReturn;
+} /* End of function xNetworkInterfaceInitialise() */
 
-	while(link_detect[0] != ETHER_FLAG_ON_LINK_ON);
 
-	return_code = xTaskCreate(receive_check, "ETHER_RECEIVE_CHECK_TASK", 100/* stack size (word) */, 0,  configMAX_PRIORITIES, &ether_receive_check_task_handle);
-	if(return_code == xTaskCreate)
-	{
-        /* The task was created.  Use the task's handle to delete the task. */
-        vTaskDelete( ether_receive_check_task_handle );
-	}
-
-	return return_code;
-}
-/*-----------------------------------------------------------*/
-
-BaseType_t xNetworkInterfaceOutput( NetworkBufferDescriptor_t * const pxNetworkBuffer )
+/***********************************************************************************************************************
+ * Function Name: xNetworkInterfaceOutput ()
+ * Description  : Simple network output interface.
+ * Arguments    : pxDescriptor, xReleaseAfterSend
+ * Return Value : pdTRUE, pdFALSE
+ **********************************************************************************************************************/
+BaseType_t xNetworkInterfaceOutput( NetworkBufferDescriptor_t * const pxDescriptor, BaseType_t xReleaseAfterSend )
 {
-	int16_t return_code;
+    /* Simple network interfaces (as opposed to more efficient zero copy network
+    interfaces) just use Ethernet peripheral driver library functions to copy
+    data from the FreeRTOS+TCP buffer into the peripheral driver's own buffer.
+    This example assumes SendData() is a peripheral driver library function that
+    takes a pointer to the start of the data to be sent and the length of the
+    data to be sent as two separate parameters.  The start of the data is located
+    by pxDescriptor->pucEthernetBuffer.  The length of the data is located
+    by pxDescriptor->xDataLength. */
+    if(0  > SendData( pxDescriptor->pucEthernetBuffer, pxDescriptor->xDataLength ))
+    {
+        vReleaseNetworkBufferAndDescriptor( pxDescriptor );
+    	return pdFALSE;
+    }
 
-	/* 簡易実装しました。あとでゼロコピー対応に直します。（シェルティ） */
-	static uint8_t tmp_buf[1514];
-	memcpy(tmp_buf, pxNetworkBuffer->pucEthernetBuffer, pxNetworkBuffer->xDataLength);
-	return_code = lan_write(0, tmp_buf, 14, tmp_buf + 14, pxNetworkBuffer->xDataLength - 14);
-	if(return_code == 0)
-	{
-		/* Call the standard trace macro to log the send event. */
-		iptraceNETWORK_INTERFACE_TRANSMIT();
-	}
-	else
-	{
-		/* fail sending (nothing to do) */
-	}
-	vReleaseNetworkBufferAndDescriptor(pxNetworkBuffer);
-	return 0;
-}
-/*-----------------------------------------------------------*/
+    /* Call the standard trace macro to log the send event. */
+    iptraceNETWORK_INTERFACE_TRANSMIT();
 
-uint32_t ulRand(void)
+    if( xReleaseAfterSend != pdFALSE )
+    {
+        /* It is assumed SendData() copies the data out of the FreeRTOS+TCP Ethernet
+        buffer.  The Ethernet buffer is therefore no longer needed, and must be
+        freed for re-use. */
+        vReleaseNetworkBufferAndDescriptor( pxDescriptor );
+    }
+
+    return pdTRUE;
+} /* End of function xNetworkInterfaceOutput() */
+
+
+/***********************************************************************************************************************
+ * Function Name: prvEMACDeferredInterruptHandlerTask ()
+ * Description  : The deferred interrupt handler is a standard RTOS task.
+ * Arguments    : pvParameters
+ * Return Value : none
+ **********************************************************************************************************************/
+static void prvEMACDeferredInterruptHandlerTask( void *pvParameters )
 {
-	/* 後でハードウェア実装(暗号器使用)に変更します (シェルティ) */
-	uint32_t tmp;
-	get_random_number(&tmp, 4);
-	return tmp;
-}
+NetworkBufferDescriptor_t *pxBufferDescriptor;
+size_t xBytesReceived;
 
+/* Used to indicate that xSendEventStructToIPTask() is being called because
+of an Ethernet receive event. */
+IPStackEvent_t xRxEvent;
+
+uint8_t *buffer_pointer;
+
+    for( ;; )
+    {
+		vTaskDelay(10);
+    	xTaskToNotify = ether_receive_check_task_handle;
+
+        /* Wait for the Ethernet MAC interrupt to indicate that another packet
+        has been received.  */
+        ulTaskNotifyTake( pdFALSE, portMAX_DELAY );
+
+        /* See how much data was received.  */
+        xBytesReceived = R_ETHER_Read_ZC2(ETHER_CHANNEL_0, (void **)&buffer_pointer);
+
+        if( xBytesReceived > 0 )
+        {
+            /* Allocate a network buffer descriptor that points to a buffer
+            large enough to hold the received frame.  As this is the simple
+            rather than efficient example the received data will just be copied
+            into this buffer. */
+            pxBufferDescriptor = pxGetNetworkBufferWithDescriptor( xBytesReceived, 0 );
+
+            if( pxBufferDescriptor != NULL )
+            {
+                /* pxBufferDescriptor->pucEthernetBuffer now points to an Ethernet
+                buffer large enough to hold the received data.  Copy the
+                received data into pcNetworkBuffer->pucEthernetBuffer.  Here it
+                is assumed ReceiveData() is a peripheral driver function that
+                copies the received data into a buffer passed in as the function's
+                parameter.  Remember! While is is a simple robust technique -
+                it is not efficient.  An example that uses a zero copy technique
+                is provided further down this page. */
+            	memcpy(pxBufferDescriptor->pucEthernetBuffer, buffer_pointer, xBytesReceived);
+                //ReceiveData( pxBufferDescriptor->pucEthernetBuffer );
+                pxBufferDescriptor->xDataLength = xBytesReceived;
+
+                R_ETHER_Read_ZC2_BufRelease(ETHER_CHANNEL_0);
+
+                /* See if the data contained in the received Ethernet frame needs
+                to be processed.  NOTE! It is preferable to do this in
+                the interrupt service routine itself, which would remove the need
+                to unblock this task for packets that don't need processing. */
+                if( eConsiderFrameForProcessing( pxBufferDescriptor->pucEthernetBuffer ) == eProcessBuffer )
+                {
+                    /* The event about to be sent to the TCP/IP is an Rx event. */
+                    xRxEvent.eEventType = eNetworkRxEvent;
+
+                    /* pvData is used to point to the network buffer descriptor that
+                    now references the received data. */
+                    xRxEvent.pvData = ( void * ) pxBufferDescriptor;
+
+                    /* Send the data to the TCP/IP stack. */
+                    if( xSendEventStructToIPTask( &xRxEvent, 0 ) == pdFALSE )
+                    {
+                        /* The buffer could not be sent to the IP task so the buffer must be released. */
+                        vReleaseNetworkBufferAndDescriptor( pxBufferDescriptor );
+
+                        /* Make a call to the standard trace macro to log the occurrence. */
+                        iptraceETHERNET_RX_EVENT_LOST();
+                    }
+                    else
+                    {
+                        /* The message was successfully sent to the TCP/IP stack.
+                        Call the standard trace macro to log the occurrence. */
+                        iptraceNETWORK_INTERFACE_RECEIVE();
+                        nop();
+                    }
+                }
+                else
+                {
+                    /* The Ethernet frame can be dropped, but the Ethernet buffer must be released. */
+                    vReleaseNetworkBufferAndDescriptor( pxBufferDescriptor );
+                }
+            }
+            else
+            {
+                /* The event was lost because a network buffer was not available.
+                Call the standard trace macro to log the occurrence. */
+                iptraceETHERNET_RX_EVENT_LOST();
+            }
+        }
+    }
+} /* End of function prvEMACDeferredInterruptHandlerTask() */
+
+
+/***********************************************************************************************************************
+ * Function Name: xApplicationDNSQueryHook ()
+ * Description  :
+ * Arguments    : pcName string pointer
+ * Return Value :
+ **********************************************************************************************************************/
+BaseType_t xApplicationDNSQueryHook(const char *pcName )
+{
+    return strcmp( pcName, "RX65N" ); //TODO complete stub function
+} /* End of function xApplicationDNSQueryHook() */
+
+
+/***********************************************************************************************************************
+ * Function Name: vNetworkInterfaceAllocateRAMToBuffers ()
+ * Description  : .
+ * Arguments    : pxNetworkBuffers
+ * Return Value : none
+ **********************************************************************************************************************/
 void vNetworkInterfaceAllocateRAMToBuffers( NetworkBufferDescriptor_t pxNetworkBuffers[ ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS ] )
 {
 	uint32_t ul;
     uint8_t *buffer_address;
     buffer_address = __sectop("B_ETHERNET_BUFFERS_1");
 
-    /* ------------------------------------------------------------------
-     * RX MCU Ether driver buffer specification
-     * ------------------------------------------------------------------
-     *
-     * top -> B_ETHERNET_BUFFERS_1 |receive buffer 1| (each buffers are always aligned at 32bit)
-     *                             |receive buffer 2|
-     *                             |       :        |  ETHER_CFG_EMAC_RX_DESCRIPTORS
-     *                             |transmit buffer1|
-     *                             |transmit buffer2|
-     *                             |       :        |  ETHER_CFG_EMAC_TX_DESCRIPTORS
-     * */
-
 	for( ul = 0; ul < ipconfigNUM_NETWORK_BUFFER_DESCRIPTORS; ul++ )
 	{
 		pxNetworkBuffers[ul].pucEthernetBuffer = (buffer_address + (ETHER_CFG_BUFSIZE * ul));
 	}
-}
+}  /* End of function vNetworkInterfaceAllocateRAMToBuffers() */
 
-void check_ether_link(void)
+
+/***********************************************************************************************************************
+ * Function Name: InitializeNetwork ()
+ * Description  :
+ * Arguments    : none
+ * Return Value : pdTRUE, pdFALSE
+ **********************************************************************************************************************/
+static int InitializeNetwork(void)
+{
+	ether_return_t eth_ret;
+	BaseType_t return_code = pdFALSE;
+    ether_param_t   param;
+	uint8_t myethaddr[6] =
+	{
+	    configMAC_ADDR0,
+	    configMAC_ADDR1,
+	    configMAC_ADDR2,
+	    configMAC_ADDR3,
+	    configMAC_ADDR4,
+	    configMAC_ADDR5
+	}; //XXX Fix me
+
+#if (BSP_CFG_BOARD_REVISION == 0) || (BSP_CFG_BOARD_REVISION == 1)	/* RX65N RSK */
+	R_ETHER_PinSet_ETHERC0_MII();
+#elif (BSP_CFG_BOARD_REVISION == 2) 	/* RX65N Envision Kit */
+	R_ETHER_PinSet_ETHERC0_MII();
+	R_ETHER_PinSet_ETHERC0_RMII();
+#endif
+	R_ETHER_Initial();
+	callback_ether_regist();
+
+	param.channel = ETHER_CHANNEL_0;
+	eth_ret = R_ETHER_Control(CONTROL_POWER_ON, param);        // PHY mode settings, module stop cancellation
+
+    if (ETHER_SUCCESS != eth_ret)
+    {
+        return pdFALSE;
+    }
+
+	eth_ret = R_ETHER_Open_ZC2(ETHER_CHANNEL_0, myethaddr, ETHER_FLAG_OFF);
+
+    if (ETHER_SUCCESS != eth_ret)
+    {
+        return pdFALSE;
+    }
+
+	do //TODO allow for timeout
+	{
+		eth_ret = R_ETHER_CheckLink_ZC(0);
+	} while(ETHER_SUCCESS != eth_ret);
+
+	vTaskDelay(3000);
+
+	return_code = xTaskCreate(prvEMACDeferredInterruptHandlerTask,
+                              "ETHER_RECEIVE_CHECK_TASK",
+							  100,
+							  0,
+							  configMAX_PRIORITIES,
+							  &ether_receive_check_task_handle);
+
+    if (pdFALSE == return_code)
+    {
+        return pdFALSE;
+    }
+
+	timer_id = 1;
+
+	timer_handle = xTimerCreate("ETHER_TIMER",
+                                250,
+								pdTRUE,
+								&timer_id,
+								&check_ether_link);
+
+	xTimerStart(timer_handle, 0);
+
+    return pdTRUE;
+} /* End of function InitializeNetwork() */
+
+
+/***********************************************************************************************************************
+ * Function Name: SendData ()
+ * Description  :
+ * Arguments    : pucBuffer, length
+ * Return Value : 0 success, negative fail
+ **********************************************************************************************************************/
+static int16_t SendData( uint8_t *pucBuffer, size_t length )//TODO complete stub function
+{
+    ether_return_t ret;
+    uint8_t * pwrite_buffer;
+    uint16_t write_buf_size;
+
+    /* (1) Retrieve the transmit buffer location controlled by the  descriptor. */
+    ret = R_ETHER_Write_ZC2_GetBuf(ETHER_CHANNEL_0, (void **) &pwrite_buffer, &write_buf_size);
+
+	if (ETHER_SUCCESS == ret)
+	{
+		if (write_buf_size >= length)
+		{
+			memcpy(pwrite_buffer, pucBuffer, length);
+		}
+        if (length < ETHER_BUFSIZE_MIN)                                         /*under minimum*/
+        {
+            memset((pwrite_buffer + length), 0, (ETHER_BUFSIZE_MIN - length));  /*padding*/
+            length = ETHER_BUFSIZE_MIN;                                         /*resize*/
+        }
+        ret = R_ETHER_Write_ZC2_SetBuf(ETHER_CHANNEL_0, (uint16_t)length);
+        ret = R_ETHER_CheckWrite(ETHER_CHANNEL_0);
+	}
+
+	if (ETHER_SUCCESS != ret)
+	{
+		return -5; // XXX return meaningful value
+	}
+	else
+	{
+	    return 0;
+	}
+} /* End of function SendData() */
+
+
+/***********************************************************************************************************************
+* Function Name: EINT_Trig_isr
+* Description  : Standard frame received interrupt handler
+* Arguments    : ectrl - EDMAC and ETHERC control structure
+* Return Value : None
+* Note         : This callback function is executed when EINT0 interrupt occurred.
+***********************************************************************************************************************/
+void EINT_Trig_isr(void *ectrl)
+{
+	ether_cb_arg_t *pdecode;
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	pdecode = (ether_cb_arg_t*)ectrl;
+
+	if (pdecode->status_eesr & 0x00040000)// EDMAC FR (Frame Receive Event) interrupt
+    {
+		if(xTaskToNotify != NULL)
+		{
+			vTaskNotifyGiveFromISR(ether_receive_check_task_handle, &xHigherPriorityTaskWoken);
+		}
+	    /* If xHigherPriorityTaskWoken is now set to pdTRUE then a context switch
+	    should be performed to ensure the interrupt returns directly to the highest
+	    priority task.  The macro used for this purpose is dependent on the port in
+	    use and may be called portEND_SWITCHING_ISR(). */
+	    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+		//TODO complete interrupt handler for other events.
+    }
+} /* End of function EINT_Trig_isr() */
+
+
+/***********************************************************************************************************************
+ * Function Name: check_ether_link ()
+ * Description  : Checks status of Ethernet link channel 0. Should be executed on a periodic basis.
+ * Arguments    : none
+ * Return Value : none
+ **********************************************************************************************************************/
+static void check_ether_link(TimerHandle_t xTimer )
 {
 	R_ETHER_LinkProcess(0);
 	tcpudp_time_cnt++;
-}
+} /* End of function check_ether_link() */
 
-void receive_check(void)
+
+/***********************************************************************************************************************
+ * Function Name: ulRand ()
+ * Description  : Random number generator
+ * Arguments    : none
+ * Return Value : unsigned 32-bit random number
+ **********************************************************************************************************************/
+uint32_t ulRand( void )   //TODO make true random number
 {
-	bool pktSuccess, pktLost;
-	IPStackEvent_t xRxEvent;
-	uint8_t *buffer_pointer;
-	int32_t received_data_size;
-	NetworkBufferDescriptor_t *pxBufferDescriptor;
-
-	while(1)
-	{
-		ulTaskNotifyTake( pdFALSE, portMAX_DELAY );
-		received_data_size = lan_read(0, &buffer_pointer);
-
-		if(received_data_size > 0)
-		{
-			pxBufferDescriptor = pxGetNetworkBufferWithDescriptor( received_data_size, 0 );
-			if(pxBufferDescriptor != NULL)
-			{
-				memcpy(pxBufferDescriptor->pucEthernetBuffer, buffer_pointer, received_data_size);
-				pxBufferDescriptor->xDataLength = received_data_size;
-				xRxEvent.eEventType = eNetworkRxEvent;
-				xRxEvent.pvData = pxBufferDescriptor;
-				// Send the data to the TCP/IP stack
-				if( xSendEventStructToIPTask( &xRxEvent, 0 ) == pdFALSE )
-				{   // failed
-					vReleaseNetworkBufferAndDescriptor( pxBufferDescriptor );
-					pktLost = true;
-				}
-				else
-				{   // success
-					pktSuccess = true;
-				}
-			}
-		}
-		rcv_buff_release(0, buffer_pointer);
-	}
-}
+	uint32_t tmp;
+	get_random_number(&tmp, 4);
+	return tmp;
+} /* End of function ulRand() */
 
 /******************************************************************************
 Functions : random number generator(XorShift method)
@@ -307,266 +511,6 @@ void get_random_number(uint8_t *data, uint32_t len)
     }
 }
 
-int32_t lan_open(void)
-{
-    int32_t ret;
-    ether_param_t   param;
-
-    R_ETHER_Initial();
-    callback_ether_regist();
-
-    param.channel = ETHER_CHANNEL_0;
-    R_ETHER_Control(CONTROL_POWER_ON, param);
-#if (ETHER_CHANNEL_MAX >= 2)
-    param.channel = ETHER_CHANNEL_1;
-    R_ETHER_Control(CONTROL_POWER_ON, param);
-#endif
-
-    ret = R_ETHER_Open_ZC2(0, renesas_mac_address, false);
-    if (ETHER_SUCCESS != ret)
-    {
-        return -1;
-    }
-#if (ETHER_CHANNEL_MAX >= 2)
-    ret = R_ETHER_Open_ZC2(1, (const uint8_t *) & _myethaddr[1], false);
-    if (ETHER_SUCCESS != ret)
-    {
-        return -1;
-    }
-#endif
-
-    return 0;
-}
-
-int32_t lan_close(void)
-{
-    ether_param_t   param;
-
-    R_ETHER_Close_ZC2(0);
-#if (ETHER_CHANNEL_MAX >= 2)
-    R_ETHER_Close_ZC2(1);
-#endif
-
-    param.channel = ETHER_CHANNEL_0;
-    R_ETHER_Control(CONTROL_POWER_OFF, param);
-#if (ETHER_CHANNEL_MAX >= 2)
-    param.channel = ETHER_CHANNEL_1;
-    R_ETHER_Control(CONTROL_POWER_OFF, param);
-#endif
-
-    return 0;
-}
-
-int32_t lan_read(uint32_t lan_port_no, uint8_t **buf)
-{
-    int32_t driver_ret;
-    int32_t return_code;
-
-    driver_ret = R_ETHER_Read_ZC2(lan_port_no, (void **)buf);
-    if (driver_ret > 0)
-    {
-        return_code = driver_ret;
-    }
-    else if (driver_ret == 0)
-    {
-        /* R_Ether_Read() returns "0" when receiving data is nothing */
-        return_code = -1; // Return code "-1" notifies "no data" to T4.
-    }
-    else
-    {
-        /* R_Ether_Read() returns "negative values" when error occurred */
-        return_code = -2; // Return code "-2" notifies "Ether controller disable" to T4.
-//      return_code = -5; // Return code "-5" notifies "reset request" to T4.
-//      return_code = -6; // Return code "-6" notifies "CRC error" to T4.
-    }
-
-#if defined (_T4_TEST)
-    return_code = lan_read_for_test(lan_port_no, buf, return_code);
-#endif
-
-    return return_code;
-}
-
-int32_t lan_write(uint8_t lan_port_no, uint8_t *header , uint32_t header_len, uint8_t *data , uint32_t data_len)
-{
-    int32_t driver_ret;
-    uint8_t *buf;
-    uint16_t buf_size;
-    uint16_t    framesize;
-
-    driver_ret = R_ETHER_Write_ZC2_GetBuf(lan_port_no, (void **) & buf, &buf_size);
-    if (ETHER_SUCCESS == driver_ret)
-    {
-        framesize = header_len + data_len;                                      /*data length calc.*/
-        if (buf_size >= framesize)
-        {
-            memcpy(buf, header, header_len);
-            memcpy(buf + header_len, data, data_len);
-            if (framesize < ETHER_BUFSIZE_MIN)                                  /*under minimum*/
-            {
-                memset((buf + framesize), 0, (ETHER_BUFSIZE_MIN - framesize));  /*padding*/
-                framesize = ETHER_BUFSIZE_MIN;                                  /*resize*/
-            }
-            else
-            {
-                /*nothing todo*/
-            }
-            driver_ret =  R_ETHER_Write_ZC2_SetBuf(lan_port_no, (uint16_t)framesize);
-            if (ETHER_SUCCESS == driver_ret)
-            {
-                return 0;
-            }
-        }
-    }
-    return -5;
-}
-
-int32_t rcv_buff_release(uint8_t lan_port_no)
-{
-    /* This function is called when TCP/IP finished using receive buffer specified lan_read. */
-    R_ETHER_Read_ZC2_BufRelease(lan_port_no);
-    return 0;
-}
-
 /***********************************************************************************************************************
-* Function Name: callback_ether
-* Description  : Regist of callback function
-* Arguments    : -
-* Return Value : 0: success, -1:failed
-***********************************************************************************************************************/
-int32_t callback_ether_regist(void)
-{
-    ether_param_t   param;
-    ether_cb_t      cb_func;
-
-    int32_t         ret;
-
-    /* Set the callback function (LAN cable connect/disconnect event) */
-    cb_func.pcb_func     = &callback_ether;
-    param.ether_callback = cb_func;
-    ret = R_ETHER_Control(CONTROL_SET_CALLBACK, param);
-    if (ETHER_SUCCESS != ret)
-    {
-        return -1;
-    }
-
-    /* Set the callback function (Ether interrupt event) */
-    cb_func.pcb_int_hnd     = &lan_inthdr;
-    param.ether_callback = cb_func;
-    ret = R_ETHER_Control(CONTROL_SET_INT_HANDLER, param);
-    if (ETHER_SUCCESS != ret)
-    {
-        return -1;
-    }
-    return 0;
-} /* End of function callback_ether_regist() */
-
-/***********************************************************************************************************************
-* Function Name: callback_ether
-* Description  : Sample of the callback function
-* Arguments    : pparam -
-*
-* Return Value : none
-***********************************************************************************************************************/
-void callback_ether(void * pparam)
-{
-    ether_cb_arg_t    * pdecode;
-    uint32_t            channel;
-
-    pdecode = (ether_cb_arg_t *)pparam;
-    channel = pdecode->channel;                             /* Get Ethernet channel number */
-
-    switch (pdecode->event_id)
-    {
-        /* Callback function that notifies user to have detected magic packet. */
-        case ETHER_CB_EVENT_ID_WAKEON_LAN:
-            callback_wakeon_lan(channel);
-            break;
-
-        /* Callback function that notifies user to have become Link up. */
-        case ETHER_CB_EVENT_ID_LINK_ON:
-            callback_link_on(channel);
-            break;
-
-        /* Callback function that notifies user to have become Link down. */
-        case ETHER_CB_EVENT_ID_LINK_OFF:
-            callback_link_off(channel);
-            break;
-
-        default:
-            break;
-    }
-} /* End of function callback_ether() */
-
-/***********************************************************************************************************************
-* Function Name: callback_wakeon_lan
-* Description  :
-* Arguments    : channel -
-*                    Ethernet channel number
-* Return Value : none
-***********************************************************************************************************************/
-static void callback_wakeon_lan(uint32_t channel)
-{
-    if (ETHER_CHANNEL_MAX > channel)
-    {
-        magic_packet_detect[channel] = 1;
-
-        /* Please add necessary processing when magic packet is detected.  */
-    }
-} /* End of function callback_wakeon_lan() */
-
-/***********************************************************************************************************************
-* Function Name: callback_link_on
-* Description  :
-* Arguments    : channel -
-*                    Ethernet channel number
-* Return Value : none
-***********************************************************************************************************************/
-static void callback_link_on(uint32_t channel)
-{
-    if (ETHER_CHANNEL_MAX > channel)
-    {
-        if((link_detect[channel] != ETHER_FLAG_ON_LINK_ON))
-        {
-        	/* notify link on event to FreeRTOS+TCP */
-        	nop();
-        }
-        link_detect[channel] = ETHER_FLAG_ON_LINK_ON;
-
-        /* Please add necessary processing when becoming Link up. */
-    }
-} /* End of function callback_link_on() */
-
-/***********************************************************************************************************************
-* Function Name: callback_link_off
-* Description  :
-* Arguments    : channel -
-*                    Ethernet channel number
-* Return Value : none
-***********************************************************************************************************************/
-static void callback_link_off(uint32_t channel)
-{
-    if (ETHER_CHANNEL_MAX > channel)
-    {
-        if((link_detect[channel] != ETHER_FLAG_ON_LINK_OFF))
-        {
-        	/* notify link off event to FreeRTOS+TCP */
-        	nop();
-        }
-        link_detect[channel] = ETHER_FLAG_ON_LINK_OFF;
-
-        /* Please add necessary processing when becoming Link down. */
-    }
-} /* End of function ether_cb_link_off() */
-
-void lan_inthdr(void *ppram)
-{
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-
-	if(ether_receive_check_task_handle != 0)
-	{
-		/* notify receive event to FreeRTOS+TCP */
-		vTaskNotifyGiveFromISR(ether_receive_check_task_handle, &xHigherPriorityTaskWoken);
-		portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
-	}
-}
+ End of file "NetworkInterface.c"
+ **********************************************************************************************************************/

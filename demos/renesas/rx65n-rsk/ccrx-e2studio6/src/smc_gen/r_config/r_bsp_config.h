@@ -135,14 +135,14 @@ Configuration Options
     /* If only 1 stack is chosen using BSP_CFG_USER_STACK_ENABLE then no RAM will be allocated for the user stack. */
     #if (BSP_CFG_USER_STACK_ENABLE == 1)
     /* User Stack size in bytes. The Renesas RX toolchain sets the stack size using the #pragma stacksize directive. */
-    #pragma stacksize su=0x2000
+    #pragma stacksize su=0x3000
     #endif
 
 /* Interrupt Stack size in bytes. The Renesas RX toolchain sets the stack size using the #pragma stacksize directive.
  * If the interrupt stack is the only stack being used then the user will likely want to increase the default size
  * below.
  */
-#pragma stacksize si=0x2000
+#pragma stacksize si=0x3000
 #endif
 
 #endif /* BSP_CFG_STARTUP_DISABLE == 0 */
@@ -156,7 +156,7 @@ Configuration Options
       choose 'Contents' in E2Studio. This will present a list of modules that can be included. Uncheck the box for
       stdio.h. 
 */
-#define BSP_CFG_HEAP_BYTES              (0x400)
+#define BSP_CFG_HEAP_BYTES              (0x2000)
 
 /* Initializes C input & output library functions.
    0 = Disable I/O library initialization in resetprg.c. If you are not using stdio then use this value.
@@ -165,10 +165,10 @@ Configuration Options
 
 /* If desired the user may redirect the stdio charget() and/or charput() functions to their own respective functions
    by enabling below and providing and replacing the my_sw_... function names with the names of their own functions. */
-#define BSP_CFG_USER_CHARGET_ENABLED    (1)
+#define BSP_CFG_USER_CHARGET_ENABLED    (0)
 #define BSP_CFG_USER_CHARGET_FUNCTION     my_sw_charget_function
 
-#define BSP_CFG_USER_CHARPUT_ENABLED    (1)
+#define BSP_CFG_USER_CHARPUT_ENABLED    (0)
 #define BSP_CFG_USER_CHARPUT_FUNCTION     my_sw_charput_function
 
 /* After reset MCU will operate in Supervisor mode. To switch to User mode, set this macro to '1'. For more information
@@ -444,7 +444,7 @@ Configuration Options
 
 /* This macro lets other modules no if a RTOS is being used.
    0 = RTOS is not used. 
-   1 = RTOS is used.ã€?(FreeRTOS)
+   1 = RTOS is used.?¿½?(FreeRTOS)
 */
 #define BSP_CFG_RTOS_USED               (1)
 
@@ -527,6 +527,13 @@ Configuration Options
 /* This macro is used to define the voltage that is supplied to the MCU (Vcc). This macro is defined in millivolts. This
    macro does not actually change anything on the MCU. Some FIT modules need this information so it is defined here. */
 #define BSP_CFG_MCU_VCC_MV                          (3300)
+
+/* There are multiple versions of the RSKRX65N-2MB. Choose which board is currently being used below.
+   0 = 1st Prototype Board (RTK50565N2CxxxxxBR)
+   1 = rev. 1.00 Board (RTK50565N2C00000BE)
+   2 = RX65N Envision Kit
+*/
+#define BSP_CFG_BOARD_REVISION                      (1)
 
 #endif /* R_BSP_CONFIG_REF_HEADER_FILE */
 
