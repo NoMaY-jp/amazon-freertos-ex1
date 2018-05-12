@@ -28,7 +28,8 @@ Getting start steps:
           aws_clientcredential_keys.h
            clientcredentialCLIENT_CERTIFICATE_PEM[]
            clientcredentialCLIENT_PRIVATE_KEY_PEM[]
- step6:  Start Renesas IDE (e2 studio) and import Amazon FreeRTOS project
+ step6:  Start Renesas IDE (e2 studio) and import Amazon FreeRTOS project.
+         The project folder is placed into /demos/renesas/rx65n-rsk/ccrx-e2studio6
  step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
          Refer to following text.
          /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
