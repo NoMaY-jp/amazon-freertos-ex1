@@ -32,6 +32,8 @@ Getting start steps:
  step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
          Refer to following text.
          /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
+         And modefy the ./realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/mcu_interrupts.c 
+         Line851 from #if 0 to #if 1.
  step8:  Configure your envirionment using Smart Configurator
          Refer to following text.
          /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/generate!.txt
