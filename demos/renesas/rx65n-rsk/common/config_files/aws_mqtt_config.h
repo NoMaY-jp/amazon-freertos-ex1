@@ -38,7 +38,7 @@
  *
  * This gives the user flexibility of registering a callback per topic.
  */
-#define mqttconfigENABLE_SUBSCRIPTION_MANAGEMENT
+#define mqttconfigENABLE_SUBSCRIPTION_MANAGEMENT            ( 1 )
 
 /**
  * @brief Maximum length of the topic which can be stored in subscription
@@ -66,7 +66,5 @@ extern void vAssertCalled( void );
  * @brief Set this macro to 1 for enabling debug logs.
  */
 #define mqttconfigENABLE_DEBUG_LOGS    1
-
-#define mqttconfigENABLE_SUBSCRIPTION_MANAGEMENT 
 
 #endif /* _AWS_MQTT_CONFIG_H_ */

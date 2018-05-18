@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS V1.2.3
+ * Amazon FreeRTOS V1.2.5
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -46,7 +46,7 @@ typedef struct {
 			uint8_t		ucMajor;
 		} x;
 #elif (defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || (__big_endian__ == 1) || (__BYTE_ORDER == __BIG_ENDIAN) \
-   || (defined(__RX) && defined(__CCRX__) && defined(__BIG)
+   || (defined(__RX) && defined(__CCRX__) && defined(__BIG))
 		struct version {
 			uint8_t		ucMajor;
 			uint8_t		ucMinor;

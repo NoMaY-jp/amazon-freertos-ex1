@@ -1,5 +1,5 @@
 /*
- * Amazon FreeRTOS V1.2.3
+ * Amazon FreeRTOS V1.2.5
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -57,7 +57,7 @@ void DEMO_RUNNER_RunDemos( void )
     /* vStartSimpleTCPServerTasks(); */
     /* vStartTCPEchoClientTasks_SingleTasks(); */
     /* vStartTCPEchoClientTasks_SeparateTasks(); */
-    /* vStartShadowDemoTasks();
+    /* vStartShadowDemoTasks(); */
     /* vStartGreenGrassDiscoveryTask(); */
     /* vStartOTAUpdateDemoTask(); */
 }

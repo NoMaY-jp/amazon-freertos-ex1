@@ -68,4 +68,7 @@ static s16 prvWriteBlock(OTA_FileContext_t * const C, s32 iOffset, u8 * const pa
 	return -1;
 }
 
-#endif
+#else
+void dummy_function_to_avoid_empty_translation_unit_warning (void);
+#endif /* INCLUDE_FROM_OTA_AGENT */
+

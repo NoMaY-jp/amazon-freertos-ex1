@@ -240,6 +240,11 @@
 			<locationURI>AWS_IOT_MCU_ROOT/lib/ota/aws_rsprintf.c</locationURI>
 		</link>
 		<link>
+			<name>lib/aws/pkcs11/aws_pkcs11_mbedtls.c</name>
+			<type>1</type>
+			<locationURI>AWS_IOT_MCU_ROOT/lib/pkcs11/mbedtls/aws_pkcs11_mbedtls.c</locationURI>
+		</link>
+		<link>
 			<name>lib/third_party/mbedtls/include</name>
 			<type>2</type>
 			<locationURI>AWS_IOT_MCU_ROOT/lib/third_party/mbedtls/include</locationURI>

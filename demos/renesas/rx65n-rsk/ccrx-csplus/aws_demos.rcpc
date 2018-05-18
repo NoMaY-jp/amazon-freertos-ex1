@@ -51,8 +51,13 @@
           <Path>..\..\..\common\tcp\aws_tcp_echo_client_single_task.c</Path>
         </Category>
         <Category Name="application_code">
+          <Path>..\common\application_code\entropy_hardware_poll.c</Path>
+          <Path>..\common\application_code\freertos_usr_func.c</Path>
+          <Path>..\common\application_code\freertos_usr_func.h</Path>
           <Path>..\common\application_code\helper.c</Path>
           <Path>..\common\application_code\main.c</Path>
+          <Path>..\common\application_code\rskrx65n_uart.c</Path>
+          <Path>..\common\application_code\rskrx65n_uart.h</Path>
           <Path>..\common\application_code\time.h</Path>
           <Category Name="renesas_code">
             <Path>..\common\application_code\renesas_code\placeholder.txt</Path>
@@ -66,6 +71,7 @@
           <Path>..\common\config_files\aws_ggd_config.h</Path>
           <Path>..\common\config_files\aws_mqtt_agent_config.h</Path>
           <Path>..\common\config_files\aws_mqtt_config.h</Path>
+          <Path>..\common\config_files\aws_pkcs11_config.h</Path>
           <Path>..\common\config_files\aws_secure_sockets_config.h</Path>
           <Path>..\common\config_files\aws_shadow_config.h</Path>
           <Path>..\common\config_files\aws_wifi_config.h</Path>
@@ -136,6 +142,7 @@
                 <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\README_DRIVER_DISCLAIMER.txt</Path>
                 <Category Name="RX">
                   <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\NetworkInterface.c</Path>
+                  <Path>..\..\..\..\lib\FreeRTOS-Plus-TCP\source\portable\NetworkInterface\RX\ether_callback.c</Path>
                 </Category>
               </Category>
             </Category>
@@ -200,14 +207,14 @@
             <Path>..\..\..\..\lib\include\private\aws_default_root_certificates.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_doubly_linked_list.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_ggd_config_defaults.h</Path>
-            <Path>..\..\..\..\lib\include\private\aws_greengrass_lib_private.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_helper_secure_connect.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_lib_init.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_mqtt_agent_config_defaults.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_mqtt_buffer.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_mqtt_config_defaults.h</Path>
-            <Path>..\..\..\..\lib\include\private\aws_mqtt_lib_private.h</Path>
+            <Path>..\..\..\..\lib\include\private\aws_ota_agent_internal.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_ota_cbor.h</Path>
+            <Path>..\..\..\..\lib\include\private\aws_ota_cbor_internal.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_ota_pal.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_ota_types.h</Path>
             <Path>..\..\..\..\lib\include\private\aws_rsprintf.h</Path>
@@ -239,10 +246,13 @@
           </Category>
         </Category>
         <Category Name="pkcs11">
+          <Category Name="mbedtls">
+            <Path>..\..\..\..\lib\pkcs11\mbedtls\aws_pkcs11_mbedtls.c</Path>
+          </Category>
           <Category Name="portable">
             <Category Name="renesas">
               <Category Name="rx65n-rsk">
-                <Path>..\..\..\..\lib\pkcs11\portable\renesas\rx65n-rsk\pkcs11.c</Path>
+                <Path>..\..\..\..\lib\pkcs11\portable\renesas\rx65n-rsk\aws_pkcs11_pal.c</Path>
               </Category>
             </Category>
           </Category>
@@ -335,6 +345,7 @@
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\platform_time.h</Path>
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\ripemd160.h</Path>
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\rsa.h</Path>
+                <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\rsa_internal.h</Path>
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\sha1.h</Path>
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\sha256.h</Path>
                 <Path>..\..\..\..\lib\third_party\mbedtls\include\mbedtls\sha512.h</Path>
@@ -403,6 +414,7 @@
               <Path>..\..\..\..\lib\third_party\mbedtls\library\platform.c</Path>
               <Path>..\..\..\..\lib\third_party\mbedtls\library\ripemd160.c</Path>
               <Path>..\..\..\..\lib\third_party\mbedtls\library\rsa.c</Path>
+              <Path>..\..\..\..\lib\third_party\mbedtls\library\rsa_internal.c</Path>
               <Path>..\..\..\..\lib\third_party\mbedtls\library\sha1.c</Path>
               <Path>..\..\..\..\lib\third_party\mbedtls\library\sha256.c</Path>
               <Path>..\..\..\..\lib\third_party\mbedtls\library\sha512.c</Path>
@@ -429,9 +441,9 @@
           </Category>
           <Category Name="mcu_vendor">
             <Category Name="renesas">
-              <Category Name="DriverLibName">
-                <Category Name="DriverLibVersion">
-                  <Path>..\..\..\..\lib\third_party\mcu_vendor\renesas\DriverLibName\DriverLibVersion\placeholder.txt</Path>
+              <Category Name="driver_library">
+                <Category Name="driver_library_version">
+                  <Path>..\..\..\..\lib\third_party\mcu_vendor\renesas\driver_library\driver_library_version\placeholder.txt</Path>
                 </Category>
               </Category>
             </Category>
@@ -458,16 +470,6 @@
         </Category>
       </Category>
       <Category Name="src">
-        <Path>src\lcd_conf.c</Path>
-        <Path>src\r_ascii.c</Path>
-        <Path>src\r_ascii.h</Path>
-        <Path>src\r_simple_graphic.c</Path>
-        <Path>src\r_simple_graphic_if.h</Path>
-        <Path>src\rx65n_rsk_aws.c</Path>
-        <Category Name="FreeRTOS_user">
-          <Path>src\FreeRTOS_user\freertos_usr_func.c</Path>
-          <Path>src\FreeRTOS_user\freertos_usr_func.h</Path>
-        </Category>
         <Category Name="realtime_OS_pkg">
           <Path>src\realtime_OS_pkg\get!.txt</Path>
           <Category Name="alternative">
@@ -477,16 +479,19 @@
           </Category>
           <Category Name="r_bsp_rtos">
             <Path>src\realtime_OS_pkg\r_bsp_rtos\platform.h</Path>
+            <Path>src\realtime_OS_pkg\r_bsp_rtos\platform__unused.h</Path>
             <Path>src\realtime_OS_pkg\r_bsp_rtos\readme.txt</Path>
             <Category Name="board">
               <Category Name="rskrx65n_2mb">
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\dbsct.c</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.c</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup.h</Path>
+                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup__unused.c</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowlvl.c</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.c</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\lowsrc.h</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp.h</Path>
+                <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp__unused.h</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_config_reference.h</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\r_bsp_interrupt_config_reference.h</Path>
                 <Path>src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\resetprg.c</Path>
@@ -557,7 +562,6 @@
           </Category>
         </Category>
         <Category Name="smc_gen">
-          <Path>src\smc_gen\generate!.txt</Path>
           <Category Name="general">
             <Path>src\smc_gen\general\r_cg_hardware_setup.c</Path>
             <Path>src\smc_gen\general\r_cg_macrodriver.h</Path>
@@ -627,6 +631,20 @@
               </Category>
             </Category>
           </Category>
+          <Category Name="r_byteq">
+            <Path>src\smc_gen\r_byteq\r_byteq_if.h</Path>
+            <Path>src\smc_gen\r_byteq\readme.txt</Path>
+            <Category Name="doc">
+              <Path>src\smc_gen\r_byteq\doc\r01an1683jj0160_rx.pdf</Path>
+            </Category>
+            <Category Name="ref">
+              <Path>src\smc_gen\r_byteq\ref\r_byteq_config_reference.h</Path>
+            </Category>
+            <Category Name="src">
+              <Path>src\smc_gen\r_byteq\src\r_byteq.c</Path>
+              <Path>src\smc_gen\r_byteq\src\r_byteq_private.h</Path>
+            </Category>
+          </Category>
           <Category Name="r_cmt_rx">
             <Path>src\smc_gen\r_cmt_rx\r_cmt_rx_if.h</Path>
             <Path>src\smc_gen\r_cmt_rx\readme.txt</Path>
@@ -649,9 +667,11 @@
             <Path>src\smc_gen\r_config\r_bsp_config.h</Path>
             <Path>src\smc_gen\r_config\r_bsp_config_readme.txt</Path>
             <Path>src\smc_gen\r_config\r_bsp_interrupt_config.h</Path>
+            <Path>src\smc_gen\r_config\r_byteq_config.h</Path>
             <Path>src\smc_gen\r_config\r_cmt_rx_config.h</Path>
             <Path>src\smc_gen\r_config\r_ether_rx_config.h</Path>
             <Path>src\smc_gen\r_config\r_flash_rx_config.h</Path>
+            <Path>src\smc_gen\r_config\r_sci_rx_config.h</Path>
           </Category>
           <Category Name="r_ether_rx">
             <Path>src\smc_gen\r_ether_rx\r_ether_rx_if.h</Path>
@@ -741,6 +761,35 @@
             <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.c</Path>
             <Path>src\smc_gen\r_pincfg\r_ether_rx_pinset.h</Path>
             <Path>src\smc_gen\r_pincfg\r_pinset.h</Path>
+            <Path>src\smc_gen\r_pincfg\r_sci_rx_pinset.c</Path>
+            <Path>src\smc_gen\r_pincfg\r_sci_rx_pinset.h</Path>
+          </Category>
+          <Category Name="r_sci_rx">
+            <Path>src\smc_gen\r_sci_rx\r_sci_rx_if.h</Path>
+            <Path>src\smc_gen\r_sci_rx\readme.txt</Path>
+            <Category Name="doc">
+              <Category Name="en">
+                <Path>src\smc_gen\r_sci_rx\doc\en\r01an1815ej0200-rx.pdf</Path>
+              </Category>
+              <Category Name="ja">
+                <Path>src\smc_gen\r_sci_rx\doc\ja\r01an1815jj0200-rx.pdf</Path>
+              </Category>
+            </Category>
+            <Category Name="ref">
+              <Path>src\smc_gen\r_sci_rx\ref\r_sci_rx_config_reference.h</Path>
+            </Category>
+            <Category Name="src">
+              <Path>src\smc_gen\r_sci_rx\src\r_sci_rx.c</Path>
+              <Path>src\smc_gen\r_sci_rx\src\r_sci_rx_platform.h</Path>
+              <Path>src\smc_gen\r_sci_rx\src\r_sci_rx_private.h</Path>
+              <Category Name="targets">
+                <Category Name="rx65n">
+                  <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n.c</Path>
+                  <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n_data.c</Path>
+                  <Path>src\smc_gen\r_sci_rx\src\targets\rx65n\r_sci_rx65n_private.h</Path>
+                </Category>
+              </Category>
+            </Category>
           </Category>
         </Category>
       </Category>
@@ -776,7 +825,6 @@
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_cmt_rtos_rx"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_cmt_rtos_rx\src"</Option>
-          <Option>-include="${ProjDirPath}\..\${ProjName}\src\FreeRTOS_user"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_bsp"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_config"</Option>
@@ -790,6 +838,10 @@
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_3"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_4"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\targets"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_sci_rx"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_sci_rx\src"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_byteq"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_byteq\src"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</Option>
           <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</Option>
           <Option>-nomessage</Option>
@@ -804,6 +856,8 @@
         <AssembleOptions>
           <Option>-isa=rxv2</Option>
           <Option>-fpu</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</Option>
+          <Option>-include="${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</Option>
           <Option>-debug</Option>
           <Option>-nologo</Option>
           <Option>-output=${CONFIGDIR}</Option>
@@ -817,7 +871,7 @@
           <Option>-nooptimize</Option>
           <Option>-rom=D=R,D_1=R_1,D_2=R_2</Option>
           <Option>-nologo</Option>
-          <Option>-start=B_1,B_2,B/0,B_FRAME2_1/0800000,B_ETHERNET_BUFFERS_1,B_RX_DESC_1,B_TX_DESC_1,SU,SI,R_1,R_2,R/0840000,C_1,C_2,C,C$*,D*,W*,L,P*/0FFF00000,EXCEPTVECT/0FFFFFF80,RESETVECT/0FFFFFFFC</Option>
+          <Option>-start=B_1,R_1,B_2,R_2,B,R/00800000,B_ETHERNET_BUFFERS_1,B_TX_DESC_1,B_RX_DESC_1,SU,SI/00840000,C_1,C_2,C,C$*,D*,W*,L,P*/FFE00000,EXCEPTVECT/FFFFFF80,RESETVECT/FFFFFFFC</Option>
           <Option>-end</Option>
           <Option>-output="${ProjName}.mot"</Option>
           <Option>-form=stype</Option>
@@ -849,8 +903,11 @@
           <Path>HardwareDebug\aws_subscribe_publish_loop.obj</Path>
           <Path>HardwareDebug\aws_tcp_echo_client_separate_tasks.obj</Path>
           <Path>HardwareDebug\aws_tcp_echo_client_single_task.obj</Path>
+          <Path>HardwareDebug\entropy_hardware_poll.obj</Path>
+          <Path>HardwareDebug\freertos_usr_func.obj</Path>
           <Path>HardwareDebug\helper.obj</Path>
           <Path>HardwareDebug\main.obj</Path>
+          <Path>HardwareDebug\rskrx65n_uart.obj</Path>
           <Path>HardwareDebug\event_groups.obj</Path>
           <Path>HardwareDebug\list.obj</Path>
           <Path>HardwareDebug\heap_4.obj</Path>
@@ -870,6 +927,7 @@
           <Path>HardwareDebug\FreeRTOS_UDP_IP.obj</Path>
           <Path>HardwareDebug\BufferAllocation_2.obj</Path>
           <Path>HardwareDebug\NetworkInterface.obj</Path>
+          <Path>HardwareDebug\ether_callback.obj</Path>
           <Path>HardwareDebug\FreeRTOS_FTP_commands.obj</Path>
           <Path>HardwareDebug\FreeRTOS_HTTP_commands.obj</Path>
           <Path>HardwareDebug\aws_bufferpool_static_thread_safe.obj</Path>
@@ -880,8 +938,10 @@
           <Path>HardwareDebug\aws_mqtt_lib.obj</Path>
           <Path>HardwareDebug\aws_ota_agent.obj</Path>
           <Path>HardwareDebug\aws_ota_cbor.obj</Path>
+          <Path>HardwareDebug\aws_ota_pal.obj</Path>
           <Path>HardwareDebug\aws_rsprintf.obj</Path>
-          <Path>HardwareDebug\pkcs11.obj</Path>
+          <Path>HardwareDebug\aws_pkcs11_mbedtls.obj</Path>
+          <Path>HardwareDebug\aws_pkcs11_pal.obj</Path>
           <Path>HardwareDebug\aws_secure_sockets.obj</Path>
           <Path>HardwareDebug\aws_shadow.obj</Path>
           <Path>HardwareDebug\aws_shadow_json.obj</Path>
@@ -937,6 +997,7 @@
           <Path>HardwareDebug\platform.obj</Path>
           <Path>HardwareDebug\ripemd160.obj</Path>
           <Path>HardwareDebug\rsa.obj</Path>
+          <Path>HardwareDebug\rsa_internal.obj</Path>
           <Path>HardwareDebug\sha1.obj</Path>
           <Path>HardwareDebug\sha256.obj</Path>
           <Path>HardwareDebug\sha512.obj</Path>
@@ -965,10 +1026,6 @@
           <Path>HardwareDebug\cborparser.obj</Path>
           <Path>HardwareDebug\cborparser_dup_string.obj</Path>
           <Path>HardwareDebug\cborpretty.obj</Path>
-          <Path>HardwareDebug\freertos_usr_func.obj</Path>
-          <Path>HardwareDebug\lcd_conf.obj</Path>
-          <Path>HardwareDebug\r_ascii.obj</Path>
-          <Path>HardwareDebug\r_simple_graphic.obj</Path>
           <Path>HardwareDebug\dbsct.obj</Path>
           <Path>HardwareDebug\hwsetup.obj</Path>
           <Path>HardwareDebug\lowlvl.obj</Path>
@@ -990,6 +1047,7 @@
           <Path>HardwareDebug\r_smc_cgc.obj</Path>
           <Path>HardwareDebug\r_smc_cgc_user.obj</Path>
           <Path>HardwareDebug\r_smc_interrupt.obj</Path>
+          <Path>HardwareDebug\r_byteq.obj</Path>
           <Path>HardwareDebug\phy.obj</Path>
           <Path>HardwareDebug\r_ether_rx.obj</Path>
           <Path>HardwareDebug\r_ether_setting_rx65n.obj</Path>
@@ -1006,15 +1064,18 @@
           <Path>HardwareDebug\r_flash_rx.obj</Path>
           <Path>HardwareDebug\Pin.obj</Path>
           <Path>HardwareDebug\r_ether_rx_pinset.obj</Path>
+          <Path>HardwareDebug\r_sci_rx_pinset.obj</Path>
+          <Path>HardwareDebug\r_sci_rx.obj</Path>
+          <Path>HardwareDebug\r_sci_rx65n.obj</Path>
+          <Path>HardwareDebug\r_sci_rx65n_data.obj</Path>
           <Path>HardwareDebug\aws_demos.lib</Path>
         </LinkOrder>
-        <NoTargetFile Target="..\..\..\..\lib\ota\portable\renesas\rx65n-rsk\aws_ota_pal.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\Common\FreeRTOS_TCP_server.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\FTP\FreeRTOS_FTP_server.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\HTTP\FreeRTOS_HTTP_server.c"/>
         <NoTargetFile Target="..\..\..\..\lib\FreeRTOS-Plus-TCP\source\protocols\NTP\NTPDemo.c"/>
         <NoTargetFile Target="src\realtime_OS_pkg\alternative\hwsetup.c"/>
-        <NoTargetFile Target="src\rx65n_rsk_aws.c"/>
+        <NoTargetFile Target="src\realtime_OS_pkg\r_bsp_rtos\board\rskrx65n_2mb\hwsetup__unused.c"/>
         <CommonOptions>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\config_files"</IncludePathForC>
@@ -1037,7 +1098,6 @@
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_bsp_rtos\mcu\rx65n\register_access"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_cmt_rtos_rx"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\realtime_OS_pkg\r_cmt_rtos_rx\src"</IncludePathForC>
-          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\FreeRTOS_user"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_bsp"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_config"</IncludePathForC>
@@ -1051,8 +1111,14 @@
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_3"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\flash_type_4"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_flash_rx\src\targets"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_sci_rx"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_sci_rx\src"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_byteq"</IncludePathForC>
+          <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_byteq\src"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</IncludePathForC>
           <IncludePathForC>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</IncludePathForC>
+          <IncludePathForAsm>"${ProjDirPath}\..\${ProjName}\src\smc_gen\general"</IncludePathForAsm>
+          <IncludePathForAsm>"${ProjDirPath}\..\${ProjName}\src\smc_gen\r_pincfg"</IncludePathForAsm>
         </CommonOptions>
       </BuildMode>
     </BuildOptions>

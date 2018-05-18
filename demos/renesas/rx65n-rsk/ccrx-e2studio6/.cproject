@@ -57,7 +57,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/register_access}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/realtime_OS_pkg/r_cmt_rtos_rx}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/realtime_OS_pkg/r_cmt_rtos_rx/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS_user}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_bsp}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/smc_gen/r_config}&quot;"/>
@@ -82,7 +81,6 @@
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.debug.494805343" name="デバッグ情報を出力する" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.debug" useByScannerDiscovery="false"/>
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.changeMessageInfo.1727278324" name="ウォーニング・メッセージの種別をインフォメーションに変更する" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.changeMessageInfo" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.changeMessageInfoNum.1921813303" name="メッセージ番号" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.changeMessageInfoNum" useByScannerDiscovery="false" value="21644" valueType="string"/>
-								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.optimize.136080325" name="最適化レベル" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.optimize" useByScannerDiscovery="false" value="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.option.optimize.level0" valueType="enumerated"/>
 								<inputType id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.gcc.inputType.16071463" name="Compiler Input C" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.gcc.inputType"/>
 								<inputType id="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.gpp.inputType.334789223" name="Compiler Input CPP" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.compiler.gpp.inputType"/>
 							</tool>
@@ -101,7 +99,7 @@
 									<listOptionValue builtIn="false" value="D_1=R_1"/>
 									<listOptionValue builtIn="false" value="D_2=R_2"/>
 								</option>
-								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.linkerSection.1447513805" name="セクション" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.linkerSection" useByScannerDiscovery="false" value="B_1,B_2,B/0,B_FRAME2_1/0800000,B_ETHERNET_BUFFERS_1,B_RX_DESC_1,B_TX_DESC_1,SU,SI,R_1,R_2,R/0840000,C_1,C_2,C,C$*,D*,W*,L,P*/0FFF00000,EXCEPTVECT/0FFFFFF80,RESETVECT/0FFFFFFFC" valueType="string"/>
+								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.linkerSection.1447513805" name="セクション" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.linkerSection" useByScannerDiscovery="false" value="B_1,R_1,B_2,R_2,B,R/00800000,B_ETHERNET_BUFFERS_1,B_TX_DESC_1,B_RX_DESC_1,SU,SI/00840000,C_1,C_2,C,C$*,D*,W*,L,P*/FFE00000,EXCEPTVECT/FFFFFF80,RESETVECT/FFFFFFFC" valueType="string"/>
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.vect.736338400" name="可変ベクタテーブルのアドレス未設定ベクタ番号に指定するアドレス" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.vect" useByScannerDiscovery="false" value="_undefined_interrupt_source_isr" valueType="string"/>
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.debug.420301023" name="デバッグ情報を出力する" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.debug" useByScannerDiscovery="false"/>
 								<option id="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.inputFile.669491131" name="リンクするリロケータブル・ファイル、ライブラリ・ファイルおよびバイナリ・ファイル" superClass="com.renesas.cdt.managedbuild.renesas.ccrx.linker.option.inputFile" useByScannerDiscovery="false"/>
@@ -127,8 +125,8 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="application_code"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="config_files"/>
-						<entry excluding="aws/ota/aws_ota_pal.c|aws/FreeRTOS-Plus-TCP/source/protocols/Common/FreeRTOS_TCP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/FTP/FreeRTOS_FTP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/HTTP/FreeRTOS_HTTP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/NTP/NTPDemo.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib"/>
-						<entry excluding="smc_gen/r_bsp|smc_gen/r_bsp__unused|smc_gen/r_cmt_rx|smc_gen/r_cmt_rx__unused|realtime_OS_pkg/alternative|realtime_OS_pkg/alternative/hwsetup.c|realtime_OS_pkg/r_bsp_rtos/board/rskrx65n_2mb/hwsetup__unused.c|rx65n_rsk_aws.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="aws/FreeRTOS-Plus-TCP/source/protocols/Common/FreeRTOS_TCP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/FTP/FreeRTOS_FTP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/HTTP/FreeRTOS_HTTP_server.c|aws/FreeRTOS-Plus-TCP/source/protocols/NTP/NTPDemo.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="lib"/>
+						<entry excluding="smc_gen/r_bsp|smc_gen/r_bsp__unused|smc_gen/r_cmt_rx|smc_gen/r_cmt_rx__unused|realtime_OS_pkg/alternative|realtime_OS_pkg/alternative/hwsetup.c|realtime_OS_pkg/r_bsp_rtos/board/rskrx65n_2mb/hwsetup__unused.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -144,5 +142,4 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="refreshScope"/>
-	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>
