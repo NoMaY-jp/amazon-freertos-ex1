@@ -13,6 +13,11 @@ MCU (like some peripheral with 100MHz class CPU) as "Amazon FreeRTOS".
 As you know "Amazon Web Service(AWS)" is one of biggest IoT Cloud Service in W/W.
 "Amazon FreeRTOS" can make a way to connect the "Amazon Web Service" like following steps.
 
+Download or Clone repository from GitHub.
+The download zip file name is "amazon-freertos-master.zip".
+Extract this zip or your clone directory has "demos" and "lib" directory readme, etc.
+This is our root directory called <root>.
+
 Getting start steps:
  step1:  Refer to the Development Environment (recommended) section to get the board and tools.
  step2:  Setup tools for your PC.
@@ -21,7 +26,7 @@ Getting start steps:
  step4:  Make your AWS account, and make your "Things" on AWS,
          and enable Security Policy to allow all your device will connect to your "Things".
  step5:  Make your device certification and private key and settings put this into your source code.
-         /demos/common/include
+         <root>/demos/common/include
           aws_clientcredential.h
            clientcredentialMQTT_BROKER_ENDPOINT[]
            clientcredentialIOT_THING_NAME
@@ -29,15 +34,15 @@ Getting start steps:
            clientcredentialCLIENT_CERTIFICATE_PEM[]
            clientcredentialCLIENT_PRIVATE_KEY_PEM[]
  step6:  Start Renesas IDE (e2 studio) and import Amazon FreeRTOS project.
-         The project folder is placed into /demos/renesas/rx65n-rsk/ccrx-e2studio6
+         import sequence: file->import->existing project into workspace -> select a root directory
+         The project folder is placed into <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6
+         Please specify this directory only.
  step7:  Get/Put Device Driver from Renesas Webpage and put it into your project.
          Refer to following text.
-         /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
-         And modefy the ./realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/mcu_interrupts.c 
-         Line851 from #if 0 to #if 1.
+         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/realtime_OS_pkg/get!.txt
  step8:  Configure your envirionment using Smart Configurator
          Refer to following text.
-         /demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/generate!.txt
+         <root>/demos/renesas/rx65n-rsk/ccrx-e2studio6/src/smc_gen/generate!.txt
  step9:  Build
  step10: Execute, confirm console log will show the Echo message from AWS.
          The log will be output from G1CUSB connector as UART/USB.
@@ -54,6 +59,11 @@ I hope this solution will be helpful for embedded system developer in W/W.
 --------------------------------------------------------------------------
 Change Logs
 --------------------------------------------------------------------------
+v0.02:
+[UPDATED] Follow the upstream from Amazon FreeRTOS v1.2.5.
+[REMOVED] Getting start step7 from #ifdef 0 to 1.
+[UPDATED] Clarify Getting start root directory path same as download zip "amazon-freertos-master".
+
 v0.01:
 [ADDED] RX65N supports Amazon FreeRTOS Release Version 1.2.3 in tentative.
         Only confirmed Echo demo using Ethernet.
@@ -197,6 +207,54 @@ RX65N Envision KitARX65N RSK(2MB”Å/ˆÃ†Ší‚ ‚è•i)‚ğƒ^[ƒQƒbƒg‚ÉƒR[ƒhƒƒ“ƒe‚ğˆÛ
 --------------------------------------------------------------------------
 ¡ƒ|[ƒeƒBƒ“ƒO‹L˜^	šˆó‚ª‰ğŒˆ‚·‚×‚«‰Û‘è
 --------------------------------------------------------------------------
+2018/05/20
+@‚±‚Ì1TŠÔ‚ÅûW‚µ‚½ƒtƒB[ƒhƒoƒbƒN‚ÍˆÈ‰º3“_B
+@@ƒ‹ƒlƒTƒXƒAƒƒŠƒJF
+@@@‡@readme.txt ‚Ì step6-7 ‚ÅƒvƒƒWƒFƒNƒg‚ğ‚Ç‚Ì‚æ‚¤‚ÉƒCƒ“ƒ|[ƒg‚·‚é‚Ì‚©
+@@@@–¾Šm‚Å‚Í‚È‚¢Bimport->existing project into workspace -> select a root directory
+@@@@‚Ì‚æ‚¤‚É‘‚¢‚½‚Ù‚¤‚ª‚¢‚¢B
+@@@@ Ë(ƒVƒFƒ‹ƒeƒB): OK
+@@@‡Agenerate!.txt ‚ª‚È‚¢
+@@@@ Ë(ƒVƒFƒ‹ƒeƒB): ‚ ‚éBsmc_gen“à‚ÍƒR[ƒh¶¬‚·‚é‚ÆŠÖŒW‚È‚¢ƒtƒ@ƒCƒ‹‚ªÁ‚¦‚éd—lB
+@@@@ @@@@@@@@GitHubã‚É‚Í‘¶İ‚·‚é‚©‚ç–â‘è‚È‚µB
+@@@‡Bˆê“x‚ÉˆêŒÂ‚ÌŠÂ‹«‚µ‚©ƒCƒ“ƒ|[ƒg‚Å‚«‚È‚¢|‚ğ‘‚¢‚½‚Ù‚¤‚ª‚¢‚¢
+@@@@(RSK‚ÆEnvision Kit‚ÌƒvƒƒWƒFƒNƒg–¼‚ª“¯‚¶‚¾‚©‚çA
+@@@@@“¯‚ÉƒCƒ“ƒ|[ƒg‚µ‚æ‚¤‚Æ‚·‚é‚ÆƒCƒ“ƒ|[ƒg‚ÉƒGƒ‰[‚ªo‚éj
+@@@@ Ë(ƒVƒFƒ‹ƒeƒB): OK
+@@ƒ‹ƒlƒTƒXƒVƒ“ƒKƒ|[ƒ‹F
+@@@./realtime_OS_pkg/r_bsp_rtos/mcu/rx65n/mcu_interrupts.c 
+@@@Line851 from #if 0 to #if 1. ‚É‚ ‚éƒOƒ‹[ƒvŠ„‚è‚İ‚Ì’è‹`‚Í
+@@@ƒ†[ƒUƒAƒvƒŠ‘¤‚ÉˆÚ“®BGetting start‚Ìà–¾‚Æ‚µ‚Ä‚Í•s—v‚Æ‚µ‚Ä—Ç‚¢B
+@@@@ Ë(ƒVƒFƒ‹ƒeƒB): OKB‚½‚¾‚µˆÚ“®‚µ‚½^ˆÓ‚ğŠm‚©‚ß‚é•K—v‚ ‚èB
+@@NoMaYF
+@@@Œö®‚ªV1.2.5‚ÉƒAƒbƒvƒf[ƒgBi2018/05/20 16:00 “_‚ÅV1.2.6‚É‚È‚Á‚½‚æ‚¤‚¾j
+@@@RX65N—p‚ÌƒtƒH[ƒN‚ğV1.2.5‚ÉƒAƒbƒv‚µ‚½B‚»‚Ì‘¼’²®‚ÍˆÈ‰ºURLQÆB
+@@@http://japan.renesasrulz.com/cafe_rene/f/forum21/4772/amazon-freertos-rx/28287#28287
+@@@@ Ë(ƒVƒFƒ‹ƒeƒB): OK
+@@@
+@ì‹ÆŠJnB
+@@‚Ü‚¸‰½‚àl‚¦‚¸ƒŠƒ‚[ƒgƒtƒFƒbƒ`‚ÅNoMaY‚Ìó‘Ô‚ğæ“¾B
+@@RX65N RSK‚Ìe2 studio‚ÌƒvƒƒWƒFƒNƒg‚Å“®ìŠm”FŠJnB
+@@ƒfƒoƒbƒK‚Ìİ’è‚Å“Ç‚İ‚ŞƒoƒCƒiƒŠ–¼Ì‚ÆƒvƒƒWƒFƒNƒg–¼‚ª‚¨‚©‚µ‚©‚Á‚½‚Ì‚ÅC³B
+@@@rx65n_rsk_aws -> aws_demos
+@@‚à‚Æ‚à‚ÆƒVƒFƒ‹ƒeƒB‚ªì‚Á‚½‚Æ‚«‚Í rx65n_rsk_aws ‚Æ‚¢‚¤ƒvƒƒWƒFƒNƒg–¼‚¾‚Á‚½‚ª
+@@NoMaY‚ÌŠÂ‹«‚Å‚Íaws_demos ‚Æ‚È‚Á‚Ä‚¢‚éB—‚¿’…‚¢‚½‚çƒvƒƒWƒFƒNƒg–¼‚ğ’²®‚µ‚½‚¢B
+@@‚»‚ÌŒãAƒ‹ƒlƒTƒXƒVƒ“ƒKƒ|[ƒ‹‚ÌƒtƒB[ƒhƒoƒbƒN‚ğ”½‰fBmcu_interrupts.c‚Ì
+@@ƒOƒ‹[ƒvŠ„‚è‚İ‚ÌƒR[ƒh‚Í freertos_usr_func.c ‚ÉˆÚ“®B‚±‚Ì‘Îˆ•û–@‚Í‚â‚Á‚Ï‚è
+@@‰½‚©‹C‚É‚È‚éBŒ³‚Ì‚Ü‚Ü‚Å‚¢‚¢‚Ì‚Å‚Í‚Æ‚¢‚¤‹C‚ª‚·‚éBŠm”F‚·‚éBš
+@@step7 ‚Ìifdef‚ÉŠÖ‚·‚éw¦‚ğíœ‚µ‚½B
+@@“®ìŠm”FBƒGƒR[“®ìOKB
+@@‚È‚ñ‚©AWSÚ‘±‚É‚©‚©‚éŠÔ‚ª’Z‚­‚È‚Á‚½‹C‚ª‚·‚éB
+
+@@RX65N RSK‚ÌCS+‚ÌƒvƒƒWƒFƒNƒg‚Å“®ìŠm”FŠJnB
+@@‚±‚¿‚ç‚à“Á‚É–â‘è‚È‚µB
+@@RX65N Envision Kit‚Ìe2 studio‚ÌƒvƒƒWƒFƒNƒg‚Å“®ìŠm”FŠJnB
+@@‚±‚¿‚ç‚à“Á‚É–â‘è‚È‚µB
+@@RX65N Envision Kit‚ÌCS+‚ÌƒvƒƒWƒFƒNƒg‚Å“®ìŠm”FŠJnB
+@@‚±‚¿‚ç‚à“Á‚É–â‘è‚È‚µB
+
+@‚Ğ‚Æ‚Ü‚¸‚±‚±‚Ü‚Å‚ÅƒRƒ~ƒbƒgBv0.02‚Æ‚·‚éB
+@
 2018/05/12
 @NoMaY‚ÉƒAƒhƒoƒCƒX‚ğ‚¢‚½‚¾‚«A5/1‰Û‘è‚É‘Î‚µ‚ÄˆÈ‰º•ûj‚Æ‚µ‚½B
 @EˆÈ‰ºƒ{[ƒhˆË‘¶‚ª–³‚¢ƒR[ƒh(‘S‚­“¯‚¶‚É‚È‚Á‚½)‚È‚Ì‚Å1ŠK‘wUP‚µ‚Äƒ}[ƒW‚·‚éB
